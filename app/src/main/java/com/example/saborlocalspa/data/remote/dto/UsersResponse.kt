@@ -3,26 +3,19 @@ package com.example.saborlocalspa.data.remote.dto
 import com.google.gson.annotations.SerializedName
 
 /**
- * DTO = Data Transfer Object
- * Este objeto representa los datos que VIAJAN entre tu app y el servidor.
- * Se usa en las respuestas y solicitudes de la API, y para mapear usuarios.
+ * DTO para la respuesta de lista de usuarios.
+ * La API devuelve un objeto con "users" y metadata de paginación.
  */
-data class UserDto(
-    @SerializedName("id")
-    val id: Int, // ID único del usuario en el backend
+data class UsersResponse(
+    @SerializedName("users")
+    val users: List<UserDto>, // Lista de usuarios obtenidos de la API
 
-    @SerializedName("username")
-    val username: String, // Nombre de usuario del backend
+    @SerializedName("total")
+    val total: Int,  // Total de usuarios en la base de datos
 
-    @SerializedName("email")
-    val email: String, // Email
+    @SerializedName("skip")
+    val skip: Int,   // Cuántos usuarios se saltaron (paginación)
 
-    @SerializedName("firstName")
-    val firstName: String, // Primer nombre
-
-    @SerializedName("lastName")
-    val lastName: String, // Apellido
-
-    @SerializedName("image")
-    val image: String? = null  // URL de imagen de perfil (opcional/nula)
+    @SerializedName("limit")
+    val limit: Int   // Límite de usuarios por página
 )
