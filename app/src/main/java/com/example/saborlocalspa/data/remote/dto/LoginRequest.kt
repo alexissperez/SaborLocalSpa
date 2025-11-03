@@ -13,6 +13,6 @@ data class LoginRequest(
     @SerializedName("password")
     val password: String,  // Contraseña enviada al backend
 
-    @SerializedName("caduca en minutos")
+    @SerializedName("expiresInMins")
     val caducaEnMinutos: Int = 30  // Token expira en 30 minutos, nombre sin espacios en Kotlin
 )

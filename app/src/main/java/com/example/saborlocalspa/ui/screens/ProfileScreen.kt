@@ -14,12 +14,10 @@ import com.example.saborlocalspa.viewmodel.ProfileViewModel
 fun ProfileScreen(
     viewModel: ProfileViewModel = viewModel()
 ) {
-    // Observar el estado expuesto del ViewModel
     val state by viewModel.uiState.collectAsState()
 
-    // Cargar datos cuando la pantalla se abre
     LaunchedEffect(Unit) {
-        viewModel.loadUser(1)  // Cambia el ID si es necesario
+        viewModel.loadUser(1)
     }
 
     Box(
@@ -28,14 +26,9 @@ fun ProfileScreen(
             .padding(16.dp)
     ) {
         when {
-            // Estado: Cargando
             state.isLoading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
-
-            // Estado: Error
             state.error != null -> {
                 Column(
                     modifier = Modifier.align(Alignment.Center),
@@ -58,8 +51,6 @@ fun ProfileScreen(
                     }
                 }
             }
-
-            // Estado: Datos cargados
             else -> {
                 Column(
                     modifier = Modifier.align(Alignment.TopCenter),
@@ -70,13 +61,8 @@ fun ProfileScreen(
                         text = "Perfil de Usuario",
                         style = MaterialTheme.typography.headlineMedium
                     )
-
                     Spacer(modifier = Modifier.height(16.dp))
-
-                    // Nombre
-                    Card(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
+                    Card(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
                                 text = "Nombre",
@@ -90,11 +76,7 @@ fun ProfileScreen(
                             )
                         }
                     }
-
-                    // Email
-                    Card(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
+                    Card(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
                                 text = "Email",
@@ -108,9 +90,7 @@ fun ProfileScreen(
                             )
                         }
                     }
-
                     Spacer(modifier = Modifier.height(16.dp))
-
                     Button(onClick = { viewModel.loadUser(1) }) {
                         Text("Refrescar")
                     }
