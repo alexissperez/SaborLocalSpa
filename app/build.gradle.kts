@@ -78,6 +78,10 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     // Coil para cargar imágenes desde internet
     implementation("io.coil-kt:coil-compose:2.6.0")
+    // Coil - Para cargar imágenes desde URI
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
     // Testing (pruebas unitarias y de UI)
     testImplementation("junit:junit:4.13.2")

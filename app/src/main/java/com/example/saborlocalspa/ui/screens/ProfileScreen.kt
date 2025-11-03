@@ -1,101 +1,56 @@
-package com.example.saborlocalspa.ui.screens
+package com.example.saborlocalspa.viewmodel
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.saborlocalspa.viewmodel.ProfileViewModel
+import android.app.Application
+import android.net.Uri
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.saborlocalspa.repository.UserRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-@Composable
-fun ProfileScreen(
-    viewModel: ProfileViewModel = viewModel()
-) {
-    val state by viewModel.uiState.collectAsState()
+// Ajusta esto a tu modelo real si tienes un DTO distinto
+data class ProfileUiState(
+    val isLoading: Boolean = false,
+    val userName: String = "",
+    val userEmail: String = "",
+    val error: String? = null,
+    val formattedCreatedAt: String = "",
+    val avatarUri: Uri? = null
+)
 
-    LaunchedEffect(Unit) {
-        viewModel.loadUser(1)
+class ProfileViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val repository = UserRepository(application)
+    private val _uiState = MutableStateFlow(ProfileUiState())
+    val uiState: StateFlow<ProfileUiState> = _uiState
+
+    fun loadUser(id: Int = 1) {
+        _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+        viewModelScope.launch {
+            val result = repository.fetchUser(id)
+            result.fold(
+                onSuccess = { user ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        userName = user.username, // Ajusta al campo real del DTO
+                        userEmail = user.email ?: "",
+                        formattedCreatedAt = "", // O tu valor real
+                        error = null
+                    )
+                },
+                onFailure = { exception ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = exception.localizedMessage ?: "Error desconocido"
+                    )
+                }
+            )
+        }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        when {
-            state.isLoading -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-            state.error != null -> {
-                Column(
-                    modifier = Modifier.align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "❌ Error",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = state.error ?: "",
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = { viewModel.loadUser(1) }) {
-                        Text("Reintentar")
-                    }
-                }
-            }
-            else -> {
-                Column(
-                    modifier = Modifier.align(Alignment.TopCenter),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = "Perfil de Usuario",
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = "Nombre",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = state.userName,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        }
-                    }
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = "Email",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = state.userEmail,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = { viewModel.loadUser(1) }) {
-                        Text("Refrescar")
-                    }
-                }
-            }
-        }
+    fun updateAvatar(uri: Uri?) {
+        _uiState.update { it.copy(avatarUri = uri) }
     }
 }

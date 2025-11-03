@@ -1,46 +1,34 @@
+// RegisterScreen.kt
 package com.example.saborlocalspa.ui.screens
 
-// Importa los componentes básicos de Compose UI y Material
+import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-/**
- * Pantalla para registrar un nuevo usuario.
- * @param onRegister función callback cuando el usuario pulsa "Registrarme"
- */
 @Composable
-fun RegisterScreen(
-    onRegister: (String, String, String) -> Unit = { _, _, _ -> }
-) {
-    // Variables UI para los campos del formulario
-    var name by remember { mutableStateOf("") }      // Nombre completo
-    var email by remember { mutableStateOf("") }     // Correo electrónico
-    var password by remember { mutableStateOf("") }  // Contraseña
+fun RegisterScreen(onRegister: () -> Unit) {
+    var name by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("") }
+    var messageColor by remember { mutableStateOf(Color(0xFF8B5CF6)) } // Morado
 
-    // Centra el contenido en la pantalla
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        // Tarjeta de registro
         Card(
             modifier = Modifier.padding(16.dp)
         ) {
             Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
+                modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Título
-                Text("Registrar Usuario", style = MaterialTheme.typography.headlineSmall)
-
-                // Campo: Nombre completo
+                Text("Registrar Usuario", style = MaterialTheme.typography.headlineSmall, color=Color(0xFF7C3AED))
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
@@ -48,8 +36,6 @@ fun RegisterScreen(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
-
-                // Campo: Correo electrónico
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
@@ -57,23 +43,33 @@ fun RegisterScreen(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
-
-                // Campo: Contraseña (enmascarada)
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("Contraseña") },
-                    visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
-
-                // Botón de registro
                 Button(
-                    onClick = { onRegister(name, email, password) }, // Llama el callback definido por la UI
+                    onClick = {
+                        if (name.isBlank() || email.isBlank() || password.isBlank()) {
+                            message = "Completa todos los campos"
+                            messageColor = Color(0xFFD946EF)
+                        } else {
+                            registeredName = name
+                            registeredEmail = email
+                            message = "Registro exitoso"
+                            messageColor = Color(0xFF8B5CF6)
+                            onRegister()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Registrarme")
+                }
+                if (message.isNotEmpty()) {
+                    Text(message, color = messageColor)
                 }
             }
         }
