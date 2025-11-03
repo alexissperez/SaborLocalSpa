@@ -14,6 +14,7 @@ import com.example.saborlocalspa.repository.UserRepository
 class AppDependencies private constructor(
     val avatarRepository: AvatarRepository,
     val userRepository: UserRepository, // <-- descomenta esta línea
+
     // ...otros repositorios
 ) {
     companion object {

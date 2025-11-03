@@ -1,57 +1,28 @@
-package com.example.saborlocalspa.viewmodel
+package com.example.saborlocalspa.ui.screens
 
-import android.app.Application
-import android.net.Uri
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.saborlocalspa.repository.UserRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.example.saborlocalspa.viewmodel.ProfileViewModel
+import androidx.compose.material3.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 
+@Composable
+fun ProfileScreen(viewModel: ProfileViewModel) {
+    val state by viewModel.uiState.collectAsState()
 
-// Ajusta esto a tu modelo real si tienes un DTO distinto
-data class ProfileUiState(
-    val isLoading: Boolean = false,
-    val userName: String = "",
-    val userEmail: String = "",
-    val error: String? = null,
-    val formattedCreatedAt: String = "",
-    val avatarUri: Uri? = null
-)
-
-class ProfileViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository = UserRepository(application)
-    private val _uiState = MutableStateFlow(ProfileUiState())
-    val uiState: StateFlow<ProfileUiState> = _uiState
-
-    fun loadUser(id: Int = 1) {
-        _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-        viewModelScope.launch {
-            val result = repository.fetchUser(id)
-            result.fold(
-                onSuccess = { user ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        userName = user.username, // Ajusta al campo real del DTO
-                        userEmail = user.email ?: "",
-                        formattedCreatedAt = "", // O tu valor real
-                        error = null
-                    )
-                },
-                onFailure = { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        error = exception.localizedMessage ?: "Error desconocido"
-                    )
-                }
-            )
-        }
-    }
-
-    fun updateAvatar(uri: Uri?) {
-        _uiState.update { it.copy(avatarUri = uri) }
+    // Aquí va tu UI
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Nombre: ${state.userName}")
+        Text("Email: ${state.userEmail}")
+        // Puedes agregar más componentes aquí:
+        // - imagen de avatar si state.avatarUri != null
+        // - botón para refrescar
+        // - otras acciones
     }
 }

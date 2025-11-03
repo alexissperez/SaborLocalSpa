@@ -31,6 +31,7 @@ fun AppNavigation(
         }
         composable("perfil") {
             val application = navController.context.applicationContext as android.app.Application
+            val appDependencies = AppDependencies.getInstance(application)
             val profileViewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
                 factory = object : androidx.lifecycle.ViewModelProvider.Factory {
                     override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {

@@ -10,12 +10,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.saborlocalspa.ui.navigation.AppNavigation
+import com.example.saborlocalspa.AppDependencies
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
+            val appDependencies = AppDependencies.getInstance(application)
             val items = listOf("home", "perfil", "settings")
             var selectedItem by remember { mutableStateOf("home") }
 
@@ -41,7 +44,7 @@ class MainActivity : ComponentActivity() {
                 }
             ) { innerPadding ->
                 Box(Modifier.padding(innerPadding)) {
-                    AppNavigation(navController)
+                    AppNavigation(navController, appDependencies)
                 }
             }
         }
