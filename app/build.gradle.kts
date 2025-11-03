@@ -82,6 +82,8 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.5.0")
 
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
+    implementation("com.google.accompanist:accompanist-permissions:0.30.1")
 
     // Testing (pruebas unitarias y de UI)
     testImplementation("junit:junit:4.13.2")

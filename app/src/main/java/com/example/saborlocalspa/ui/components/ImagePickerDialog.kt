@@ -1,5 +1,6 @@
 package com.example.saborlocalspa.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
@@ -11,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-
 
 @Composable
 fun ImagePickerDialog(
@@ -25,17 +25,16 @@ fun ImagePickerDialog(
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text("Elige cómo deseas seleccionar tu imagen:")
-                Spacer(modifier = Modifier.height(8.dp))
                 ImagePickerOption(
                     icon = Icons.Filled.CameraAlt,
                     title = "Tomar foto",
                     description = "Abre la cámara para capturar una nueva foto",
                     onClick = onCameraClick
                 )
-                Divider()
+                Divider(Modifier.padding(vertical = 4.dp))
                 ImagePickerOption(
                     icon = Icons.Filled.PhotoLibrary,
                     title = "Elegir de galería",
@@ -46,7 +45,9 @@ fun ImagePickerDialog(
         },
         confirmButton = {},
         dismissButton = {
-            Button(onClick = onDismiss) { Text("Cancelar") }
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
         }
     )
 }
@@ -58,23 +59,18 @@ private fun ImagePickerOption(
     description: String,
     onClick: () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onClick
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(vertical = 12.dp, horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(imageVector = icon, contentDescription = title, modifier = Modifier.size(48.dp))
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = title, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = description, style = MaterialTheme.typography.bodySmall)
-            }
+        Icon(icon, contentDescription = title, modifier = Modifier.size(36.dp))
+        Spacer(Modifier.width(14.dp))
+        Column {
+            Text(text = title, fontWeight = FontWeight.Bold)
+            Text(text = description, style = MaterialTheme.typography.bodySmall)
         }
     }
 }

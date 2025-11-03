@@ -17,6 +17,10 @@ fun RegisterScreen(onRegister: () -> Unit) {
     var message by remember { mutableStateOf("") }
     var messageColor by remember { mutableStateOf(Color(0xFF8B5CF6)) } // Morado
 
+    // Estados para mostrar datos registrados tras éxito
+    var registeredName by remember { mutableStateOf("") }
+    var registeredEmail by remember { mutableStateOf("") }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -28,7 +32,11 @@ fun RegisterScreen(onRegister: () -> Unit) {
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("Registrar Usuario", style = MaterialTheme.typography.headlineSmall, color=Color(0xFF7C3AED))
+                Text(
+                    "Registrar Usuario",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Color(0xFF7C3AED)
+                )
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
@@ -70,6 +78,13 @@ fun RegisterScreen(onRegister: () -> Unit) {
                 }
                 if (message.isNotEmpty()) {
                     Text(message, color = messageColor)
+                }
+
+                // Muestra el nombre y email registrados si existen (opcional)
+                if (registeredName.isNotBlank() && registeredEmail.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Nombre registrado: $registeredName")
+                    Text("Email registrado: $registeredEmail")
                 }
             }
         }
