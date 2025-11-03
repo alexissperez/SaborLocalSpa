@@ -1,45 +1,30 @@
+// LoginScreen.kt
 package com.example.saborlocalspa.ui.screens
 
-// Importa componentes de Jetpack Compose y Material3
+import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-/**
- * Pantalla de inicio de sesión típica para una app Compose.
- * El parámetro onLogin se puede enlazar con un ViewModel o una función de autenticación.
- */
 @Composable
-fun LoginScreen(
-    onLogin: (String, String) -> Unit = { _, _ -> }
-) {
-    // Variables de estado para los campos del formulario
-    var email by remember { mutableStateOf("") }      // Correo electrónico del usuario
-    var password by remember { mutableStateOf("") }   // Contraseña del usuario
+fun LoginScreen(onLogin: () -> Unit) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("") }
+    var messageColor by remember { mutableStateOf(Color(0xFF8B5CF6)) }
 
-    // Layout que centra el contenido en la pantalla
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        // Tarjeta Material para el formulario de login
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Card(
             modifier = Modifier.padding(16.dp)
         ) {
             Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
+                modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Título de la pantalla
-                Text("Iniciar Sesión", style = MaterialTheme.typography.headlineSmall)
-
-                // Campo: Correo electrónico
+                Text("Iniciar Sesión", style = MaterialTheme.typography.headlineSmall, color = Color(0xFF7C3AED))
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
@@ -47,23 +32,31 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
-
-                // Campo: Contraseña (oculta el texto)
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("Contraseña") },
-                    visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
-
-                // Botón principal de login
                 Button(
-                    onClick = { onLogin(email, password) },   // Llama al callback de login al pulsar
+                    onClick = {
+                        if (email.isBlank() || password.isBlank()) {
+                            message = "Completa todos los campos"
+                            messageColor = Color(0xFFD946EF)
+                        } else {
+                            message = "Inicio de sesión exitoso"
+                            messageColor = Color(0xFF8B5CF6)
+                            onLogin()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Entrar")
+                }
+                if (message.isNotEmpty()) {
+                    Text(message, color = messageColor)
                 }
             }
         }

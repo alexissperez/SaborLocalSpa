@@ -1,21 +1,22 @@
 package com.example.saborlocalspa.ui.screens
 
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.compose.ui.unit.dp
 
-/**
- * Pantalla principal (Home) de la app, recibe un NavHostController
- * para poder navegar a otras pantallas.
- */
+
 @Composable
 fun HomeScreen(navController: NavHostController) {
-    // Puedes agregar aquí más contenido (Text, imágenes, etc)
-
-    // Botón para navegar a la pantalla de perfil.
-    // Al hacer click, el controlador de navegación cambia a la ruta "perfil".
-    Button(onClick = { navController.navigate("perfil") }) {
-        Text("Ver Perfil") // El texto mostrado en el botón
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("Pantalla Home")
+            Button(onClick = { navController.navigate("perfil") }) { Text("Ir a Perfil") }
+            Button(onClick = { navController.navigate("login") }) { Text("Ir a Login") }
+            Button(onClick = { navController.navigate("register") }) { Text("Ir a Registro") }
+        }
     }
 }
