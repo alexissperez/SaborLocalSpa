@@ -4,67 +4,54 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.saborlocalspa.AppDependencies
+import com.example.saborlocalspa.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
+// Ajusta esto a tu modelo real si tienes un DTO distinto
 data class ProfileUiState(
+    val isLoading: Boolean = false,
     val userName: String = "",
     val userEmail: String = "",
-    val avatarUri: Uri? = null,
-    val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val formattedCreatedAt: String = "",
+    val avatarUri: Uri? = null
 )
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
-    private val dependencies = AppDependencies.getInstance(application)
-    private val userRepository = dependencies.userRepository
-    private val avatarRepository = dependencies.avatarRepository
 
+    private val repository = UserRepository(application)
     private val _uiState = MutableStateFlow(ProfileUiState())
-    val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<ProfileUiState> = _uiState
 
-    init {
-        loadUserProfile()
-        loadSavedAvatar()
-    }
-
-    private fun loadUserProfile() {
-        _uiState.update {
-            it.copy(
-                userName = "Usuario Ejemplo",
-                userEmail = "ejemplo@saborlocal.cl",
-                isLoading = false,
-                error = null
+    fun loadUser(id: Int = 1) {
+        _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+        viewModelScope.launch {
+            val result = repository.fetchUser(id)
+            result.fold(
+                onSuccess = { user ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        userName = user.username, // Ajusta al campo real del DTO
+                        userEmail = user.email ?: "",
+                        formattedCreatedAt = "", // O tu valor real
+                        error = null
+                    )
+                },
+                onFailure = { exception ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = exception.localizedMessage ?: "Error desconocido"
+                    )
+                }
             )
         }
     }
 
-    private fun loadSavedAvatar() {
-        viewModelScope.launch {
-            avatarRepository.getAvatarUri().collect { savedUri ->
-                _uiState.update { it.copy(avatarUri = savedUri) }
-            }
-        }
-    }
-
-    // FUNCIÓN ACTUALIZAR AVATAR -- AQUÍ DENTRO DE LA CLASE:
     fun updateAvatar(uri: Uri?) {
-        viewModelScope.launch {
-            avatarRepository.saveAvatarUri(uri)
-        }
-    }
-
-    // Añade estas funciones ABAJO
-    fun loadUser(userId: String): ProfileUiState {
-        return _uiState.value
-    }
-
-    fun hasPermission(permission: String): Boolean {
-        return true // o tu lógica real de permisos
+        _uiState.update { it.copy(avatarUri = uri) }
     }
 }
