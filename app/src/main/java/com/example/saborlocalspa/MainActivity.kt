@@ -1,4 +1,4 @@
-package com.example.saborlocalspa.viewmodel
+package com.example.saborlocalspa
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

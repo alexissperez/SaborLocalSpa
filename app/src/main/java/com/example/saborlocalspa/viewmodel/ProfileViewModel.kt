@@ -3,15 +3,10 @@ package com.example.saborlocalspa.viewmodel
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.saborlocalspa.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
-
-// Ajusta esto a tu modelo real si tienes un DTO distinto
 data class ProfileUiState(
     val isLoading: Boolean = false,
     val userName: String = "",
@@ -23,32 +18,18 @@ data class ProfileUiState(
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = UserRepository(application)
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState
 
+    // Versión temporal: muestra datos de ejemplo siempre
     fun loadUser(id: Int = 1) {
-        _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-        viewModelScope.launch {
-            val result = repository.fetchUser(id)
-            result.fold(
-                onSuccess = { user ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        userName = user.username, // Ajusta al campo real del DTO
-                        userEmail = user.email ?: "",
-                        formattedCreatedAt = "", // O tu valor real
-                        error = null
-                    )
-                },
-                onFailure = { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        error = exception.localizedMessage ?: "Error desconocido"
-                    )
-                }
-            )
-        }
+        _uiState.value = _uiState.value.copy(
+            isLoading = false,
+            userName = "Ejemplo Nombre",
+            userEmail = "ejemplo@email.com",
+            error = null,
+            formattedCreatedAt = "01-11-2025"
+        )
     }
 
     fun updateAvatar(uri: Uri?) {
