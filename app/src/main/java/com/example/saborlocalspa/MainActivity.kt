@@ -10,41 +10,26 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.saborlocalspa.ui.navigation.AppNavigation
-import com.example.saborlocalspa.AppDependencies
-
+import com.example.saborlocalspa.viewmodel.ProfileViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val navController = rememberNavController()
-            val appDependencies = AppDependencies.getInstance(application)
             val items = listOf("home", "perfil", "settings")
             var selectedItem by remember { mutableStateOf("home") }
+            val navController = rememberNavController()
+            val appDependencies = AppDependencies.getInstance(application)
+            val profileViewModel = ProfileViewModel(appDependencies.userRepository)
 
             Scaffold(
-                bottomBar = {
-                    NavigationBar {
-                        items.forEach { item ->
-                            NavigationBarItem(
-                                selected = selectedItem == item,
-                                onClick = {
-                                    selectedItem = item
-                                    navController.navigate(item) {
-                                        popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
-                                },
-                                label = { Text(item.replaceFirstChar { it.uppercase() }) },
-                                icon = { /* Puedes poner un Icon aquí si quieres */ }
-                            )
-                        }
-                    }
-                }
+
             ) { innerPadding ->
                 Box(Modifier.padding(innerPadding)) {
-                    AppNavigation(navController, appDependencies)
+                    AppNavigation(
+                        avatarRepository = appDependencies.avatarRepository,
+                        profileViewModel = profileViewModel
+                    )
                 }
             }
         }

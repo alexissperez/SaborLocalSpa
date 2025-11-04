@@ -1,4 +1,4 @@
-package com.example.saborlocalspa.ui.navigation
+package com.example.saborlocalspa.data.remote
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
@@ -36,17 +36,15 @@ fun AppNavigation(
 
         composable("home") {
             HomeScreen(
-                navController = navController,
+                navController = navController, // Pasa navController para que HomeScreen navegue
                 avatarRepository = avatarRepository
             )
         }
         composable("profile") {
             ProfileScreen(
                 viewModel = profileViewModel,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() } // Botón volver funcional
             )
         }
     }
 }
-
-

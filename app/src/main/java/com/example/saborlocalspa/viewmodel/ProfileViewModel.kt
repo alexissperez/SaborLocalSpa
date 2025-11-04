@@ -1,22 +1,24 @@
 package com.example.saborlocalspa.viewmodel
 
-import android.app.Application
 import android.net.Uri
-import androidx.lifecycle.AndroidViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import com.example.saborlocalspa.repository.UserRepository
+import androidx.lifecycle.ViewModel
+
 
 data class ProfileUiState(
-    val isLoading: Boolean = false,
     val userName: String = "",
+    val avatarUrl: String? = null,
+    val isLoading: Boolean = false,
     val userEmail: String = "",
     val error: String? = null,
     val formattedCreatedAt: String = "",
     val avatarUri: Uri? = null
 )
 
-class ProfileViewModel(application: Application) : AndroidViewModel(application) {
+class ProfileViewModel(private val userRepository: UserRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState

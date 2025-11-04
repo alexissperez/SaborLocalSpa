@@ -22,8 +22,10 @@ import com.example.saborlocalspa.viewmodel.ProfileViewModel
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 
-
-
+object SesionUsuario {
+    var nombre: String? = null
+    var email: String? = null
+}
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,
@@ -50,7 +52,6 @@ fun ProfileScreen(
     var showEditDialog by remember { mutableStateOf(false) }
 
     if (showSelector) {
-        // ...Tu código AlertDialog para elegir cámara/galería...
         AlertDialog(
             onDismissRequest = { showSelector = false },
             confirmButton = { },
@@ -95,14 +96,11 @@ fun ProfileScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { onBack() }) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Volver"
-                )
+                Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
             }
         }
         ProfileContent(
-            uiState = state,
+            uiState = state.copy(userName = SesionUsuario.nombre ?: state.userName), // Reemplaza nombre
             puedeEditar = true,
             onRefresh = { viewModel.loadUser() },
             onEditProfile = { showEditDialog = true },
@@ -112,14 +110,67 @@ fun ProfileScreen(
 
     if (showEditDialog) {
         EditProfileDialog(
-            inicialNombre = state.userName,
+            inicialNombre = SesionUsuario.nombre ?: state.userName,
             onGuardar = { nuevoNombre ->
-                // Actualiza nombre en ViewModel
+                SesionUsuario.nombre = nuevoNombre // Actualiza sesión
                 viewModel.updateUserName(nuevoNombre)
                 showEditDialog = false
             },
             onCancelar = { showEditDialog = false }
         )
+    }
+}
+
+@Composable
+fun ProfileContent(
+    uiState: ProfileUiState,
+    puedeEditar: Boolean,
+    onRefresh: () -> Unit,
+    onEditProfile: () -> Unit,
+    onAvatarChange: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .clip(CircleShape)
+                .background(Color.Gray)
+                .clickable(enabled = puedeEditar, onClick = onAvatarChange)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            if (!uiState.avatarUrl.isNullOrBlank()) {
+                Image(
+                    painter = rememberAsyncImagePainter(uiState.avatarUrl),
+                    contentDescription = "Avatar",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Avatar",
+                    modifier = Modifier.fillMaxSize(),
+                    tint = Color.White
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Usuario: ${uiState.userName}", style = MaterialTheme.typography.titleLarge)
+        Spacer(modifier = Modifier.height(16.dp))
+        if (puedeEditar) {
+            Button(onClick = onEditProfile, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                Text("Editar Perfil")
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onRefresh, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+            Text("Refrescar datos")
+        }
     }
 }
 
@@ -138,10 +189,18 @@ fun EditProfileDialog(
             Button(onClick = {
                 if (nombre.isBlank()) error = "El nombre es obligatorio"
                 else onGuardar(nombre)
-            }) { Text("Guardar") }
+            }) {
+                Text("Guardar")
+            }
         },
-        dismissButton = { Button(onClick = onCancelar) { Text("Cancelar") } },
-        title = { Text("Editar Nombre") },
+        dismissButton = {
+            Button(onClick = onCancelar) {
+                Text("Cancelar")
+            }
+        },
+        title = {
+            Text("Editar Nombre")
+        },
         text = {
             Column {
                 OutlinedTextField(
@@ -160,4 +219,3 @@ fun EditProfileDialog(
         }
     )
 }
-

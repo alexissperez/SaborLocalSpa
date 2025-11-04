@@ -8,18 +8,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+
+object SesionUsuario {
+    var nombre: String? = null
+    var email: String? = null
+}
 
 @Composable
 fun RegisterScreen(onRegister: () -> Unit) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf("") }
     var messageColor by remember { mutableStateOf(Color(0xFF8B5CF6)) } // Morado
 
-    // Estados para mostrar datos registrados tras éxito
     var registeredName by remember { mutableStateOf("") }
     var registeredEmail by remember { mutableStateOf("") }
+
+    val isEmailValid = email.endsWith("@gmail.com") && email.length > 10
+    val isPasswordValid = password.length <= 8
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -49,26 +62,60 @@ fun RegisterScreen(onRegister: () -> Unit) {
                     onValueChange = { email = it },
                     label = { Text("Correo electrónico") },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    placeholder = { Text("ejemplo@gmail.com") },
+                    isError = email.isNotBlank() && !isEmailValid,
+                    supportingText = {
+                        if (email.isNotBlank() && !isEmailValid) {
+                            Text("El correo debe terminar en @gmail.com", color = Color.Red)
+                        }
+                    }
                 )
                 OutlinedTextField(
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = {
+                        if (it.length <= 8) password = it
+                    },
                     label = { Text("Contraseña") },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                            )
+                        }
+                    },
+                    supportingText = {
+                        if (password.length > 8) {
+                            Text("Máximo 8 caracteres", color = Color.Red)
+                        }
+                    }
                 )
                 Button(
                     onClick = {
-                        if (name.isBlank() || email.isBlank() || password.isBlank()) {
-                            message = "Completa todos los campos"
-                            messageColor = Color(0xFFD946EF)
-                        } else {
-                            registeredName = name
-                            registeredEmail = email
-                            message = "Registro exitoso"
-                            messageColor = Color(0xFF8B5CF6)
-                            onRegister()
+                        when {
+                            name.isBlank() || email.isBlank() || password.isBlank() -> {
+                                message = "Completa todos los campos"
+                                messageColor = Color(0xFFD946EF)
+                            }
+                            !isEmailValid -> {
+                                message = "El correo debe terminar en @gmail.com"
+                                messageColor = Color(0xFFD946EF)
+                            }
+                            !isPasswordValid -> {
+                                message = "La contraseña debe tener máximo 8 caracteres"
+                                messageColor = Color(0xFFD946EF)
+                            }
+                            else -> {
+                                registeredName = name
+                                registeredEmail = email
+                                message = "Registro exitoso"
+                                messageColor = Color(0xFF8B5CF6)
+                                onRegister()
+                            }
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6)),
@@ -80,7 +127,6 @@ fun RegisterScreen(onRegister: () -> Unit) {
                     Text(message, color = messageColor)
                 }
 
-                // Muestra el nombre y email registrados si existen (opcional)
                 if (registeredName.isNotBlank() && registeredEmail.isNotBlank()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text("Nombre registrado: $registeredName")
