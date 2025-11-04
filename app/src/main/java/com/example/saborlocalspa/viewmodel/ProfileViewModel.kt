@@ -31,8 +31,18 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
         )
     }
 
-
     fun updateAvatar(uri: Uri?) {
         _uiState.update { it.copy(avatarUri = uri) }
     }
+
+    // Nueva función para actualizar nombre
+    fun updateUserName(nuevoNombre: String) {
+        _uiState.update { it.copy(userName = nuevoNombre) }
+    }
+
+    // Podrías agregar función similar para email...
+    fun updateUserEmail(nuevoEmail: String) {
+        _uiState.update { it.copy(userEmail = nuevoEmail) }
+    }
 }
+

@@ -34,24 +34,23 @@ fun ProfileScreen(
     val context = LocalContext.current
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Gallery picker
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) viewModel.updateAvatar(uri)
     }
 
-    // Camera picker
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
             tempCameraUri?.let { viewModel.updateAvatar(it) }
         }
     }
 
-    // Diálogo para elegir cámara o galería
     var showSelector by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
 
     if (showSelector) {
+        // ...Tu código AlertDialog para elegir cámara/galería...
         AlertDialog(
             onDismissRequest = { showSelector = false },
             confirmButton = { },
@@ -60,7 +59,6 @@ fun ProfileScreen(
             text = {
                 Column {
                     Button(onClick = {
-                        // Cámara
                         val photoFile = File.createTempFile("avatar_", ".jpg", context.cacheDir)
                         val uri = FileProvider.getUriForFile(
                             context,
@@ -90,7 +88,6 @@ fun ProfileScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Botón de retroceso
         Row(
             Modifier
                 .fillMaxWidth()
@@ -104,126 +101,63 @@ fun ProfileScreen(
                 )
             }
         }
-        // Contenido del perfil
         ProfileContent(
             uiState = state,
             puedeEditar = true,
             onRefresh = { viewModel.loadUser() },
-            onEditProfile = { /* implementa navegación o dialogo de editar */ },
+            onEditProfile = { showEditDialog = true },
             onAvatarChange = { showSelector = true }
+        )
+    }
+
+    if (showEditDialog) {
+        EditProfileDialog(
+            inicialNombre = state.userName,
+            onGuardar = { nuevoNombre ->
+                // Actualiza nombre en ViewModel
+                viewModel.updateUserName(nuevoNombre)
+                showEditDialog = false
+            },
+            onCancelar = { showEditDialog = false }
         )
     }
 }
 
 
 @Composable
-fun ProfileContent(
-    uiState: ProfileUiState,
-    puedeEditar: Boolean,
-    onRefresh: () -> Unit,
-    onEditProfile: () -> Unit = {},
-    onAvatarChange: (Uri?) -> Unit
+fun EditProfileDialog(
+    inicialNombre: String,
+    onGuardar: (String) -> Unit,
+    onCancelar: () -> Unit
 ) {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .background(Color(0xFFD1B2FF))
-            .padding(top = 0.dp), // ya está el top padding en el Row superior
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(0.92f)
-                .heightIn(min = 340.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFFAF6FF))
-        ) {
-            Column(
-                Modifier.padding(32.dp).fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // --- Avatar ---
-                Box(
-                    Modifier.size(116.dp),
-                    contentAlignment = Alignment.BottomEnd
-                ) {
-                    if (uiState.avatarUri != null) {
-                        Image(
-                            painter = rememberAsyncImagePainter(uiState.avatarUri),
-                            contentDescription = "Avatar del usuario",
-                            modifier = Modifier
-                                .size(116.dp)
-                                .clip(CircleShape) // <- AQUÍ
-                                .background(Color(0xFF8465BE), shape = CircleShape),
-                            contentScale = ContentScale.Crop // <- Y AQUÍ
-                        )
-                    } else {
-                        Surface(
-                            modifier = Modifier
-                                .size(116.dp)
-                                .background(Color(0xFF8465BE), CircleShape),
-                            shape = CircleShape,
-                            color = Color(0xFF8465BE)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Person,
-                                contentDescription = "Avatar default",
-                                tint = Color(0xFFF3EAFE),
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(30.dp)
-                            )
-                        }
-                    }
-                    Surface(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clickable { onAvatarChange(null) },
-                        shape = CircleShape,
-                        color = Color(0xFFF1DEFF)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.CameraAlt,
-                            contentDescription = "Cambiar foto",
-                            tint = Color(0xFF6946A1),
-                            modifier = Modifier.padding(8.dp)
-                        )
-                    }
-                }
-                Spacer(Modifier.height(18.dp))
-                Text(
-                    text = uiState.userName,
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = Color(0xFF6946A1)
+    var nombre by remember { mutableStateOf(inicialNombre) }
+    var error by remember { mutableStateOf<String?>(null) }
+    AlertDialog(
+        onDismissRequest = onCancelar,
+        confirmButton = {
+            Button(onClick = {
+                if (nombre.isBlank()) error = "El nombre es obligatorio"
+                else onGuardar(nombre)
+            }) { Text("Guardar") }
+        },
+        dismissButton = { Button(onClick = onCancelar) { Text("Cancelar") } },
+        title = { Text("Editar Nombre") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = nombre,
+                    onValueChange = {
+                        nombre = it
+                        error = if (it.isBlank()) "El nombre es obligatorio" else null
+                    },
+                    isError = error != null,
+                    label = { Text("Nombre") }
                 )
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    text = uiState.userEmail,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color(0xFF6946A1)
-                )
-                Spacer(Modifier.height(18.dp))
-                if (puedeEditar) {
-                    Button(
-                        onClick = onEditProfile,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBB86FC))
-                    ) {
-                        Text("Editar Perfil", color = Color.White)
-                    }
-                } else {
-                    Text(
-                        text = "No tienes permisos para editar el perfil.",
-                        color = Color.Red
-                    )
+                if (error != null) {
+                    Text(error!!, color = Color.Red)
                 }
             }
         }
-        Spacer(Modifier.height(30.dp))
-        Button(
-            onClick = onRefresh,
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8465BE))
-        ) {
-            Text("Refrescar", color = Color.White)
-        }
-    }
+    )
 }
 
