@@ -1,37 +1,120 @@
 package com.example.saborlocalspa.ui.screens
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.material3.*
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.example.saborlocalspa.viewmodel.ProfileViewModel
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import java.io.File
+import androidx.core.content.FileProvider
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.shape.CircleShape
 import com.example.saborlocalspa.viewmodel.ProfileUiState
+import com.example.saborlocalspa.viewmodel.ProfileViewModel
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+
+
 
 @Composable
-fun ProfileScreen(viewModel: ProfileViewModel) {
+fun ProfileScreen(
+    viewModel: ProfileViewModel,
+    onBack: () -> Unit = {}
+) {
     LaunchedEffect(Unit) { viewModel.loadUser() }
     val state by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
 
-    ProfileContent(
-        uiState = state,
-        puedeEditar = true, // O tu lógica según usuario
-        onRefresh = { viewModel.loadUser() },
-        onEditProfile = { /* lógica para editar */ },
-        onAvatarChange = { uri -> viewModel.updateAvatar(uri) }
-    )
+    // Gallery picker
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) viewModel.updateAvatar(uri)
+    }
+
+    // Camera picker
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) {
+            tempCameraUri?.let { viewModel.updateAvatar(it) }
+        }
+    }
+
+    // Diálogo para elegir cámara o galería
+    var showSelector by remember { mutableStateOf(false) }
+
+    if (showSelector) {
+        AlertDialog(
+            onDismissRequest = { showSelector = false },
+            confirmButton = { },
+            dismissButton = { },
+            title = { Text("Seleccionar foto de perfil") },
+            text = {
+                Column {
+                    Button(onClick = {
+                        // Cámara
+                        val photoFile = File.createTempFile("avatar_", ".jpg", context.cacheDir)
+                        val uri = FileProvider.getUriForFile(
+                            context,
+                            context.packageName + ".provider",
+                            photoFile
+                        )
+                        tempCameraUri = uri
+                        cameraLauncher.launch(uri)
+                        showSelector = false
+                    }) {
+                        Icon(Icons.Default.CameraAlt, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Tomar foto")
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Button(onClick = {
+                        galleryLauncher.launch("image/*")
+                        showSelector = false
+                    }) {
+                        Icon(Icons.Default.PhotoLibrary, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Elegir de galería")
+                    }
+                }
+            }
+        )
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Botón de retroceso
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp, start = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { onBack() }) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Volver"
+                )
+            }
+        }
+        // Contenido del perfil
+        ProfileContent(
+            uiState = state,
+            puedeEditar = true,
+            onRefresh = { viewModel.loadUser() },
+            onEditProfile = { /* implementa navegación o dialogo de editar */ },
+            onAvatarChange = { showSelector = true }
+        )
+    }
 }
+
 
 @Composable
 fun ProfileContent(
@@ -45,7 +128,7 @@ fun ProfileContent(
         Modifier
             .fillMaxSize()
             .background(Color(0xFFD1B2FF))
-            .padding(top = 40.dp),
+            .padding(top = 0.dp), // ya está el top padding en el Row superior
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
@@ -69,7 +152,9 @@ fun ProfileContent(
                             contentDescription = "Avatar del usuario",
                             modifier = Modifier
                                 .size(116.dp)
+                                .clip(CircleShape) // <- AQUÍ
                                 .background(Color(0xFF8465BE), shape = CircleShape),
+                            contentScale = ContentScale.Crop // <- Y AQUÍ
                         )
                     } else {
                         Surface(
@@ -92,7 +177,7 @@ fun ProfileContent(
                     Surface(
                         modifier = Modifier
                             .size(36.dp)
-                            .clickable { /* implementar picker */ },
+                            .clickable { onAvatarChange(null) },
                         shape = CircleShape,
                         color = Color(0xFFF1DEFF)
                     ) {
@@ -141,3 +226,4 @@ fun ProfileContent(
         }
     }
 }
+

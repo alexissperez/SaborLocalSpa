@@ -64,6 +64,7 @@ dependencies {
     // Core y otras librerías útiles
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.activity:activity-compose:1.7.0")
+    implementation("androidx.activity:activity-compose:1.7.2")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.compose.ui:ui-tooling-preview:1.4.0")
     debugImplementation("androidx.compose.ui:ui-tooling:1.4.0")

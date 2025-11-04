@@ -22,15 +22,15 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     val uiState: StateFlow<ProfileUiState> = _uiState
 
     // Versión temporal: muestra datos de ejemplo siempre
-    fun loadUser(id: Int = 1) {
+    fun loadUser() {
+        val nombres = listOf("Ana", "Beto", "Carlos", "Dani")
+        val aleatorio = nombres.random()
         _uiState.value = _uiState.value.copy(
-            isLoading = false,
-            userName = "Ejemplo Nombre",
-            userEmail = "ejemplo@email.com",
-            error = null,
-            formattedCreatedAt = "01-11-2025"
+            userName = aleatorio,
+            userEmail = "$aleatorio@email.com"
         )
     }
+
 
     fun updateAvatar(uri: Uri?) {
         _uiState.update { it.copy(avatarUri = uri) }
