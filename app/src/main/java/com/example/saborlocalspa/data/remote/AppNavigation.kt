@@ -25,7 +25,8 @@ fun AppNavigation(
         }
         composable("login") {
             LoginScreen(
-                onLogin = { navController.navigate("home") }
+                onLogin = { navController.navigate("home") },
+                onForgotPassword = { navController.navigate("forgotPassword") } // o muestra un diálogo
             )
         }
         composable("register") {
@@ -36,15 +37,23 @@ fun AppNavigation(
 
         composable("home") {
             HomeScreen(
-                navController = navController, // Pasa navController para que HomeScreen navegue
+                navController = navController, // Así sí coincide con el parámetro correcto
                 avatarRepository = avatarRepository
             )
         }
         composable("profile") {
             ProfileScreen(
                 viewModel = profileViewModel,
-                onBack = { navController.popBackStack() } // Botón volver funcional
+                onLogout = { navController.navigate("welcome") {
+                        popUpTo("home") { inclusive = true }
+                    }
+                }
             )
         }
     }
 }
+
+
+
+
+

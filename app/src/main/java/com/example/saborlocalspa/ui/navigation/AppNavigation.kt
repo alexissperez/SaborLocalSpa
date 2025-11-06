@@ -7,6 +7,19 @@ import androidx.navigation.compose.rememberNavController
 import com.example.saborlocalspa.repository.AvatarRepository
 import com.example.saborlocalspa.viewmodel.ProfileViewModel
 import com.example.saborlocalspa.ui.screens.*
+import androidx.compose.ui.Modifier
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.Color
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.NavHostController
+import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.padding
 
 @Composable
 fun AppNavigation(
@@ -14,39 +27,95 @@ fun AppNavigation(
     profileViewModel: ProfileViewModel
 ) {
     val navController = rememberNavController()
+    val currentRoute = getCurrentRoute(navController)
 
-    NavHost(navController, startDestination = "welcome") {
-        composable("welcome") {
-            WelcomeScreen(
-                onLoginClick = { navController.navigate("login") },
-                onRegisterClick = { navController.navigate("register") },
-                onGuestClick = { navController.navigate("home") }
-            )
-        }
-        composable("login") {
-            LoginScreen(
-                onLogin = { navController.navigate("home") }
-            )
-        }
-        composable("register") {
-            RegisterScreen(
-                onRegister = { navController.navigate("home") }
-            )
-        }
+    // Lista de pantallas donde NO se debe mostrar la barra inferior
+    val hideBottomBarRoutes = listOf("welcome", "login", "register", "forgotPassword")
+    val showBottomBar = currentRoute !in hideBottomBarRoutes
 
-        composable("home") {
-            HomeScreen(
-                navController = navController,
-                avatarRepository = avatarRepository
-            )
+    Scaffold(
+        bottomBar = {
+            if (showBottomBar) {
+                NavigationBar {
+                    NavigationBarItem(
+                        selected = currentRoute == "home",
+                        onClick = { navController.navigate("home") },
+                        icon = { Icon(Icons.Filled.Home, contentDescription = null) },
+                        label = { Text("Inicio") }
+                    )
+                    NavigationBarItem(
+                        selected = currentRoute == "tiendas",
+                        onClick = { navController.navigate("tiendas") },
+                        icon = { Icon(Icons.Filled.Store, contentDescription = null) },
+                        label = { Text("Tiendas") }
+                    )
+                    NavigationBarItem(
+                        selected = currentRoute == "profile",
+                        onClick = { navController.navigate("profile") },
+                        icon = { Icon(Icons.Filled.Person, contentDescription = null, tint = Color(0xFFD946EF)) },
+                        label = { Text("Perfil", color = Color(0xFFD946EF)) }
+                    )
+                }
+            }
         }
-        composable("profile") {
-            ProfileScreen(
-                viewModel = profileViewModel,
-                onBack = { navController.popBackStack() }
-            )
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = "welcome",
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable("welcome") {
+                WelcomeScreen(
+                    onLoginClick = { navController.navigate("login") },
+                    onRegisterClick = { navController.navigate("register") },
+                    onGuestClick = { navController.navigate("home") }
+                )
+            }
+            composable("login") {
+                LoginScreen(
+                    onLogin = { navController.navigate("home") },
+                    onBack = { navController.popBackStack() },
+                    onForgotPassword = { navController.navigate("forgotPassword") }
+                )
+            }
+            composable("register") {
+                RegisterScreen(
+                    onRegister = { navController.navigate("home") },
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable("home") {
+                HomeScreen(
+                    navController = navController,
+                    avatarRepository = avatarRepository
+                )
+            }
+            composable("profile") {
+                ProfileScreen(
+                    viewModel = profileViewModel,
+                    onLogout = {
+                        // Aquí va tu lógica para cerrar sesión y navegar a la pantalla de bienvenida/login
+                        navController.navigate("welcome") {
+                            popUpTo("home") { inclusive = true }
+            }
+
+            composable("forgotPassword") {
+                ForgotPasswordScreen(
+                    onBack = { navController.popBackStack() },
+                    onLogin = { navController.navigate("login") }
+                )
+                    }
+                }
+                )
+            }
         }
     }
 }
+
+
+@Composable
+fun getCurrentRoute(navController: NavHostController): String? {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    return navBackStackEntry?.destination?.route}
 
 

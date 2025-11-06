@@ -13,126 +13,128 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-
-object SesionUsuario {
-    var nombre: String? = null
-    var email: String? = null
-}
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.runtime.remember
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.material.icons.filled.AccountCircle
 
 @Composable
-fun RegisterScreen(onRegister: () -> Unit) {
+fun RegisterScreen(
+    onBack: () -> Unit = {},
+    onRegister: () -> Unit = {},
+    onShowTerms: () -> Unit = {}
+) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-    var message by remember { mutableStateOf("") }
-    var messageColor by remember { mutableStateOf(Color(0xFF8B5CF6)) } // Morado
-
-    var registeredName by remember { mutableStateOf("") }
-    var registeredEmail by remember { mutableStateOf("") }
+    var acceptTerms by remember { mutableStateOf(false) }
 
     val isEmailValid = email.endsWith("@gmail.com") && email.length > 10
     val isPasswordValid = password.length <= 8
+    val isReady = name.isNotBlank() && isEmailValid && isPasswordValid && acceptTerms
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Card(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    "Registrar Usuario",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Color(0xFF7C3AED)
-                )
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text("Nombre completo") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Correo electrónico") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    placeholder = { Text("ejemplo@gmail.com") },
-                    isError = email.isNotBlank() && !isEmailValid,
-                    supportingText = {
-                        if (email.isNotBlank() && !isEmailValid) {
-                            Text("El correo debe terminar en @gmail.com", color = Color.Red)
-                        }
-                    }
-                )
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = {
-                        if (it.length <= 8) password = it
-                    },
-                    label = { Text("Contraseña") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(
-                                imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
-                            )
-                        }
-                    },
-                    supportingText = {
-                        if (password.length > 8) {
-                            Text("Máximo 8 caracteres", color = Color.Red)
-                        }
-                    }
-                )
-                Button(
-                    onClick = {
-                        when {
-                            name.isBlank() || email.isBlank() || password.isBlank() -> {
-                                message = "Completa todos los campos"
-                                messageColor = Color(0xFFD946EF)
-                            }
-                            !isEmailValid -> {
-                                message = "El correo debe terminar en @gmail.com"
-                                messageColor = Color(0xFFD946EF)
-                            }
-                            !isPasswordValid -> {
-                                message = "La contraseña debe tener máximo 8 caracteres"
-                                messageColor = Color(0xFFD946EF)
-                            }
-                            else -> {
-                                registeredName = name
-                                registeredEmail = email
-                                message = "Registro exitoso"
-                                messageColor = Color(0xFF8B5CF6)
-                                onRegister()
-                            }
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6)),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Registrarme")
-                }
-                if (message.isNotEmpty()) {
-                    Text(message, color = messageColor)
-                }
-
-                if (registeredName.isNotBlank() && registeredEmail.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Nombre registrado: $registeredName")
-                    Text("Email registrado: $registeredEmail")
-                }
+        Row(Modifier.fillMaxWidth()) {
+            IconButton(onClick = onBack) {
+                Icon(Icons.Filled.ArrowBack, contentDescription = "Atrás")
             }
+        }
+        Spacer(Modifier.height(10.dp))
+        Icon(
+            imageVector = Icons.Filled.Face,
+            contentDescription = null,
+            modifier = Modifier
+                .size(120.dp)
+                .align(Alignment.CenterHorizontally),
+            tint = Color(0xFFD946EF).copy(alpha = 0.6f)
+        )
+        Spacer(Modifier.height(24.dp))
+        OutlinedTextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Nombre") },
+            leadingIcon = { Icon(Icons.Filled.Person, null) },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Correo electrónico") },
+            leadingIcon = { Icon(Icons.Filled.Email, null) },
+            placeholder = { Text("ejemplo@gmail.com") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            isError = email.isNotBlank() && !isEmailValid,
+            supportingText = {
+                if (email.isNotBlank() && !isEmailValid)
+                    Text("El correo debe terminar en @gmail.com")
+            }
+        )
+        OutlinedTextField(
+            value = password,
+            onValueChange = { if (it.length <= 8) password = it },
+            label = { Text("Contraseña") },
+            leadingIcon = { Icon(Icons.Filled.Lock, null) },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                        contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                    )
+                }
+            },
+            supportingText = {
+                if (password.length > 8)
+                    Text("Máximo 8 caracteres", color = Color.Red)
+            }
+        )
+        Spacer(Modifier.height(12.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(
+                checked = acceptTerms,
+                onCheckedChange = { acceptTerms = it },
+                colors = CheckboxDefaults.colors(checkedColor = Color(0xFFD946EF))
+            )
+            TextButton(onClick = onShowTerms) {
+                Text("Acepto los Términos y Condiciones", color = Color(0xFFD946EF))
+            }
+        }
+        Spacer(Modifier.height(24.dp))
+        // El botón justo después del formulario
+        Button(
+            onClick = onRegister,
+            enabled = isReady,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isReady) Color(0xFFD946EF) else Color.LightGray
+            )
+        ) {
+            Text("Crear cuenta", color = if (isReady) Color.White else Color.Gray)
         }
     }
 }
