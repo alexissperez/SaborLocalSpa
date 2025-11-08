@@ -27,14 +27,15 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.remember
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.material.icons.filled.AccountCircle
+import com.example.saborlocalspa.viewmodel.ProfileViewModel
+
 
 @Composable
 fun RegisterScreen(
+    profileViewModel: ProfileViewModel,
     onBack: () -> Unit = {},
-    onRegister: () -> Unit = {},
-    onShowTerms: () -> Unit = {}
+    onShowTerms: () -> Unit = {},
+    onRegisterSuccess: () -> Unit = {}
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -123,9 +124,13 @@ fun RegisterScreen(
             }
         }
         Spacer(Modifier.height(24.dp))
-        // El botón justo después del formulario
+        // Botón modificado para actualizar datos y navegar
         Button(
-            onClick = onRegister,
+            onClick = {
+                profileViewModel.updateUserName(name)
+                profileViewModel.updateUserEmail(email)
+                onRegisterSuccess()
+            },
             enabled = isReady,
             modifier = Modifier
                 .fillMaxWidth()

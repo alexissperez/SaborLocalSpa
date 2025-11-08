@@ -63,7 +63,7 @@ fun WelcomeScreen(
                     onClick = onLoginClick,
                     shape = RoundedCornerShape(32.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF9C27B0), // Rosa GoodMeal
+                        containerColor = Color(0xFF9C27B0),
                         contentColor = Color.White
                     ),
 

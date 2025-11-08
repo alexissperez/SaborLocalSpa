@@ -26,8 +26,8 @@ import androidx.compose.material.icons.filled.Face
 @Composable
 fun LoginScreen(
     onLogin: () -> Unit,
-    onBack: () -> Unit = {},
-    onForgotPassword: () -> Unit = {}
+    onBack: () -> Unit,
+    onForgotPassword: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -123,7 +123,10 @@ fun LoginScreen(
         }
         Spacer(Modifier.height(12.dp))
         TextButton(onClick = onForgotPassword) {
-            Text("¿Olvidé mi contraseña?", color = Color.Black)
+            Text(
+                text = "¿Olvidaste tu contraseña?",
+                color = Color(0xFF9C27B0)
+            )
         }
     }
 }

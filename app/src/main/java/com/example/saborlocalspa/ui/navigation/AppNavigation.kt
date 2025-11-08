@@ -78,10 +78,33 @@ fun AppNavigation(
                     onForgotPassword = { navController.navigate("forgotPassword") }
                 )
             }
+            composable("forgotPassword") {
+                ForgotPasswordScreen(
+                    onBack = { navController.popBackStack() },
+                    onLogin = { navController.navigate("login") },
+                    onSendRecovery = { email -> }
+                )
+            }
             composable("register") {
                 RegisterScreen(
-                    onRegister = { navController.navigate("home") },
-                    onBack = { navController.popBackStack() }
+                    profileViewModel = profileViewModel,
+                    onBack = { navController.popBackStack() }, // <-- Esto permite volver atrás
+                    onRegisterSuccess = {
+                        navController.navigate("profile") {
+                            popUpTo("register") { inclusive = true }
+                        }
+                    }
+                )
+            }
+            composable("profile") {
+                ProfileScreen(
+                    viewModel = profileViewModel,
+                    onLogout = {
+                        navController.navigate("welcome") {
+                            popUpTo("welcome") { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
                 )
             }
             composable("home") {
@@ -90,24 +113,7 @@ fun AppNavigation(
                     avatarRepository = avatarRepository
                 )
             }
-            composable("profile") {
-                ProfileScreen(
-                    viewModel = profileViewModel,
-                    onLogout = {
-                        // Aquí va tu lógica para cerrar sesión y navegar a la pantalla de bienvenida/login
-                        navController.navigate("welcome") {
-                            popUpTo("home") { inclusive = true }
-            }
 
-            composable("forgotPassword") {
-                ForgotPasswordScreen(
-                    onBack = { navController.popBackStack() },
-                    onLogin = { navController.navigate("login") }
-                )
-                    }
-                }
-                )
-            }
         }
     }
 }

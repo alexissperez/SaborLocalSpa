@@ -29,6 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.sp
+import com.example.saborlocalspa.utils.saveImageToInternalStorage
+
+
 
 object SesionUsuario {
     var nombre: String? = null
@@ -37,21 +40,31 @@ object SesionUsuario {
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,
-    onLogout: () -> Unit // <-- Navega al login/bienvenida aquí
+    onLogout: () -> Unit
 ) {
-    LaunchedEffect(Unit) { viewModel.loadUser() }
-    val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Launchers para foto/galería
+    LaunchedEffect(Unit) { viewModel.observeAvatarUri() }
+
+// 1. launcher
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) {
+            tempCameraUri?.let { uri ->
+                val savedPath = saveImageToInternalStorage(context, uri)
+                val avatarUri = Uri.fromFile(File(savedPath))
+                viewModel.saveAvatarUri(avatarUri)
+            }
+        }
+    }
+
+
+    val state by viewModel.uiState.collectAsState()
+
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) viewModel.updateAvatar(uri)
-    }
-    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        if (success) { tempCameraUri?.let { viewModel.updateAvatar(it) } }
     }
     var showSelector by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
@@ -111,7 +124,8 @@ fun ProfileScreen(
             .background(Color(0xFFF6F4FA))
             .verticalScroll(rememberScrollState())
     ) {
-        // --------- AVATAR EDITABLE ----------
+
+        // AVATAR EDITABLE
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -123,11 +137,12 @@ fun ProfileScreen(
                     .size(94.dp)
                     .clip(CircleShape)
                     .background(Color(0xFFEDE9F7))
-                    .clickable { showSelector = true } // Abre selector
+                    .clickable { showSelector = true }
             ) {
-                if (!state.avatarUrl.isNullOrBlank()) {
+                // Pega el bloque aquí
+                if (state.avatarUri != null) {
                     Image(
-                        painter = rememberAsyncImagePainter(state.avatarUrl),
+                        painter = rememberAsyncImagePainter(state.avatarUri),
                         contentDescription = "Avatar",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
@@ -165,9 +180,10 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(18.dp))
         // --------- MENÚ ---------
-        PerfilMenuEntry(icon = Icons.Filled.Person, text = "Mi cuenta") { /* navegar */ }
         PerfilMenuEntry(icon = Icons.Filled.Edit, text = "Editar perfil") { showEditDialog = true }
-        PerfilMenuEntry(icon = Icons.Filled.ExitToApp, text = "Cerrar sesión", color = Color.Red) { onLogout() }
+        PerfilMenuEntry(icon = Icons.Filled.ExitToApp, text = "Cerrar sesión", color = Color.Red) {
+            onLogout() // <-- aquí navega a welcome
+        }
 
         Spacer(Modifier.height(22.dp))
     }
@@ -303,11 +319,15 @@ fun ProfileContent(
 @Composable
 fun ForgotPasswordScreen(
     onBack: () -> Unit,
-    onSendRecovery: (String) -> Unit = {},
-    onLogin: () -> Unit
+    onLogin: () -> Unit,
+    onSendRecovery: (String) -> Unit
 ) {
     var email by remember { mutableStateOf("") }
-    val isEmailValid = email.endsWith("@gmail.com") && email.length > 10
+    var emailError by remember { mutableStateOf(false) }
+    var submitted by remember { mutableStateOf(false) }
+
+    val MoradoPrincipal = Color(0xFF9C27B0)
+    val isEmailValid = email.contains("@gmail.com") && email.length > 5
 
     Column(
         modifier = Modifier
@@ -315,65 +335,52 @@ fun ForgotPasswordScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Row(modifier = Modifier.fillMaxWidth()) {
             IconButton(onClick = onBack) {
                 Icon(Icons.Filled.ArrowBack, contentDescription = "Atrás")
             }
         }
-
+        Spacer(Modifier.height(24.dp))
+        Text("Recuperar contraseña", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(8.dp))
-        // Logo circular
-        Surface(
-            color = Color(0xFFD946EF),
-            shape = RoundedCornerShape(100),
-            modifier = Modifier.size(90.dp),
-            shadowElevation = 6.dp
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = Icons.Filled.Face, //
-                    contentDescription = "Avatar",
-                    tint = Color.White,
-                    modifier = Modifier.size(48.dp)
-                )
-            }
-        }
-        Spacer(Modifier.height(18.dp))
-        Text("Recuperar contraseña", style = MaterialTheme.typography.headlineMedium, color = Color.Black)
-
-        Text("Correo", style = MaterialTheme.typography.bodyLarge, color = Color.Black)
-
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
-            label = { Text("correo@gmail.com") },
+            onValueChange = {
+                email = it
+                emailError = submitted && !isEmailValid
+            },
+            label = { Text("Correo") },
             leadingIcon = { Icon(Icons.Filled.Email, null) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            isError = email.isNotBlank() && !isEmailValid,
+            isError = emailError,
+            placeholder = { Text("ejemplo@gmail.com") },
             supportingText = {
-                if (email.isNotBlank() && !isEmailValid)
-                    Text("El correo debe terminar en @gmail.com")
+                if (emailError)
+                    Text("Coloca un correo válido con @gmail.com", color = MaterialTheme.colorScheme.error)
             }
         )
-
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(20.dp))
         Button(
-            onClick = { onSendRecovery(email) },
-            enabled = isEmailValid,
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD946EF)),
+            onClick = {
+                submitted = true
+                emailError = !isEmailValid
+                if (isEmailValid) {
+                    onSendRecovery(email)
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(54.dp)
-                .clip(RoundedCornerShape(32.dp))
+                .height(50.dp),
+            shape = RoundedCornerShape(30.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = MoradoPrincipal)
         ) {
-            Text("Enviar correo de recuperación", color = Color.White)
+            Text("Enviar correo", color = Color.White)
         }
-        Spacer(Modifier.height(18.dp))
-        Row {
-            TextButton(onClick = onLogin) {
-                Text("Volver al Login", color = Color(0xFFD946EF))
-            }
+        Spacer(Modifier.height(16.dp))
+        TextButton(onClick = onLogin) {
+            Text("Volver al Login", color = MoradoPrincipal)
+
         }
     }
 }

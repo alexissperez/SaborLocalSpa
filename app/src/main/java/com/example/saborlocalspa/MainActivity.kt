@@ -16,11 +16,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val items = listOf("home", "perfil", "settings")
             var selectedItem by remember { mutableStateOf("home") }
             val navController = rememberNavController()
             val appDependencies = AppDependencies.getInstance(application)
-            val profileViewModel = ProfileViewModel(appDependencies.userRepository)
+            val profileViewModel = ProfileViewModel(
+                appDependencies.userRepository,
+                appDependencies.avatarRepository
+            )
+
+
+
 
             Scaffold(
 

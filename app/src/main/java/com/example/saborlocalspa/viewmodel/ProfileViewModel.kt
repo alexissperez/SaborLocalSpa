@@ -6,6 +6,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import com.example.saborlocalspa.repository.UserRepository
 import androidx.lifecycle.ViewModel
+import com.example.saborlocalspa.utils.ImageStorageUtil
+import com.example.saborlocalspa.repository.AvatarRepository
+import android.content.Context
+import kotlinx.coroutines.launch
+import androidx.lifecycle.viewModelScope
 
 
 data class ProfileUiState(
@@ -18,31 +23,42 @@ data class ProfileUiState(
     val avatarUri: Uri? = null
 )
 
-class ProfileViewModel(private val userRepository: UserRepository) : ViewModel() {
+class ProfileViewModel(
+    private val userRepository: UserRepository,
+    private val avatarRepository: AvatarRepository
+): ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState
 
-    // Versión temporal: muestra datos de ejemplo siempre
-    fun loadUser() {
-        val nombres = listOf("Ana", "Beto", "Carlos", "Dani")
-        val aleatorio = nombres.random()
-        _uiState.value = _uiState.value.copy(
-            userName = aleatorio,
-            userEmail = "$aleatorio@email.com"
-        )
+    fun loadAvatar(context: Context) {
+        val uri = ImageStorageUtil.loadAvatarUri(context)
+        updateAvatar(uri)
+    }
+
+    fun saveAvatarUri(uri: Uri) {
+        viewModelScope.launch {
+            avatarRepository.saveAvatarUri(uri)
+            _uiState.update { it.copy(avatarUri = uri) }
+        }
+    }
+
+    fun observeAvatarUri() {
+        viewModelScope.launch {
+            avatarRepository.getAvatarUri().collect { uri ->
+                _uiState.update { it.copy(avatarUri = uri) }
+            }
+        }
     }
 
     fun updateAvatar(uri: Uri?) {
         _uiState.update { it.copy(avatarUri = uri) }
     }
 
-    // Nueva función para actualizar nombre
     fun updateUserName(nuevoNombre: String) {
         _uiState.update { it.copy(userName = nuevoNombre) }
     }
 
-    // Podrías agregar función similar para email...
     fun updateUserEmail(nuevoEmail: String) {
         _uiState.update { it.copy(userEmail = nuevoEmail) }
     }
