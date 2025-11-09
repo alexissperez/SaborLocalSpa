@@ -33,7 +33,7 @@ Inyección de dependencias: Implementación manual mediante clase AppDependencie
 Instalación:
 Clonar el repositorio:
 
- git clone https://github.com/usuario/saborlocalspa.git
+ git clone 
 cd saborlocalspa
 
 Abrir el proyecto en Android Studio Hedgehog o superior.
@@ -48,21 +48,46 @@ Ejecutar desde Android Studio con el perfil Debug.
 Para poder garantizar un desarrollo escalable, fácil de mantener y ordenado, nuestra aplicación implementa MVVM siguiendo su patrón de arquitectura. Esta arquitectura divide la aplicación en tres principales capas, cada una con su definida responsabilidad. 
 Estructura de carpetas:
 
- /data
-  ├── model (User, AuthResponse)
-  ├── repository (UserRepository)
-/ui
-  ├── screens (LoginScreen, ProfileScreen)
-  ├── components (Botones, Inputs, AvatarSelector)
-/navigation (NavGraph, rutas)
-/di (AppDependencies)
-/network (RetrofitClient)
-
+app/
+├── java/
+│ └── com.example.saborlocalspa/
+│ ├── data/
+│ │ ├── local/ dao/database/entity
+│ │ ├── remote/ dto/ ApiService /AppNavigation/ Authinterceptor/ RetrofitClient
+│ │ └── repository/ AvatarRepository.kt
+│ │
+│ ├── ui/
+│ │ ├── components/ 
+│ │ ├── navigation/
+│ │ ├── screens/ 
+│ │ └── theme/
+│ │
+│ ├── utils/
+│ ├── viewmodel/ 
+│ │
+│ ├── AppDependencies.kt 
+│ └── MainActivity.kt 
+│
+├── androidTest/ 
+│ └── ExampleInstrumentedTest.kt
+│
+└── test/ Pruebas unitarias
+└── ExampleUnitTest.kt
+data/local: clases para persistencia local (DataStore).
+data/remote: conexión a la API externa, clientes de red (Retrofit, endpoints).
+repository: contiene los repositorios que median entre ViewModel y fuentes de datos (UserRepository, AvatarRepository).
+ui/components: elementos reutilizables de interfaz (botones, inputs, avatar picker).
+ui/navigation: definición de rutas y control del flujo con NavHost.
+ui/screens:pantallas principales (LoginScreen, ProfileScreen, ForgotPasswordScreen).
+ui/theme: paleta de colores, tipografía y estilos de Compose.
+utils	Funciones de validación o utilidades generales (ValidationUtils.kt).
+viewmodel	Lógica de negocio y manejo de estado de cada pantalla (LoginViewModel, ProfileViewModel ).
+AppDependencies.kt	Inyección de dependencias manual (repositorios, ViewModels).
+MainActivity.kt	Punto de entrada de la app, donde se inicializa la navegación y el contenido Compose.
 Gestión de estado:
 Se utiliza ViewModel para mantener el estado entre cambios de configuración.
 La vista observa estados inmutables (loading, success, error) mediante StateFlow.
 El estado local (por ejemplo, selección temporal de imagen) se maneja con remember y mutableStateOf.
-
 Navegación:
 Implementada con Navigation Compose, utilizando un stack declarativo.
 
@@ -101,7 +126,7 @@ Manejo de errores HTTP y conversión automática de JSON mediante Gson Converter
 
 
 5. Endpoints
-Base URL: https://x8ki-letl-twmt.n7.xano.io/api:Rfm_61dW
+Base URL:
 Método
 Ruta
 Body
