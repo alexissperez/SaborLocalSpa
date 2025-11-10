@@ -36,7 +36,7 @@ Clonar el repositorio:
  git clone 
 cd saborlocalspa
 
-Abrir el proyecto en Android Studio Hedgehog o superior.
+Abrir el proyecto en Android Studio.
 Sincronizar dependencias con Gradle.
 
 Ejecución:
