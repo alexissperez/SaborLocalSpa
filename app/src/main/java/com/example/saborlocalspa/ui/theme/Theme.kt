@@ -8,148 +8,126 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 /**
- * Esquema de colores Light - SaborLocal
+ * Esquema de colores Light - SaborLocal (MORA DO)
  *
- * Paleta inspirada en productos frescos, locales y sostenibles:
- * - Verde bosque: Frescura y naturaleza
+ * Paleta inspirada en productos premium, locales y auténticos:
+ * - Morado bosque: Premium, exclusivo, conexión profunda
  * - Naranja terracota: Calidez y comunidad local
  * - Crema natural: Autenticidad y simplicidad
  * - Marrones tierra: Conexión con productores locales
  */
 private val LightColorScheme = lightColorScheme(
-    // ========= Primary (Verde Bosque) =========
-    primary = Primary,                      // Verde bosque #2D6A4F
+    // ========= Primary (Morado Bosque) =========
+    primary = Primary,                      // ForestPurple #6A1B9A ✅
     onPrimary = Color.White,
-    primaryContainer = LightGreen,          // Verde claro #D8F3DC
-    onPrimaryContainer = ForestGreen,
+    primaryContainer = LightPurple,         // Morado claro #E1BEE7 ✅
+    onPrimaryContainer = ForestPurple,      // ForestPurple #6A1B9A ✅
 
     // ========= Secondary (Azul Suave) =========
     secondary = Accent,                     // Azul suave #4A90E2
     onSecondary = Color.White,
-    secondaryContainer = LightBlue,         // Azul claro #E3F2FD
+    secondaryContainer = LightBlue,
     onSecondaryContainer = Color(0xFF1565C0),
 
-    // ========= Tertiary (Verde Menta) =========
-    tertiary = MintGreen,                   // Verde menta #52B788
+    // ========= Tertiary (Morado Menta) =========
+    tertiary = MintPurple,                  // MintPurple #BA68C8 ✅
     onTertiary = Color.White,
-    tertiaryContainer = PaleGreen,          // Verde pálido #F1FAF5
-    onTertiaryContainer = ForestGreen,
+    tertiaryContainer = PalePurple,         // PalePurple #F3E5F5 ✅
+    onTertiaryContainer = ForestPurple,     // ForestPurple ✅
 
-    // ========= Error (Rojo Tomate) =========
-    error = Destructive,                    // Rojo tomate #DC3545
+    // ========= Error (SIN CAMBIO) =========
+    error = Destructive,
     onError = Color.White,
-    errorContainer = DestructiveLight,      // Rojo claro #FFF0F0
+    errorContainer = DestructiveLight,
     onErrorContainer = Color(0xFF8B0000),
 
-    // ========= Background (Crema Natural) =========
-    background = Color(0xFFF8F9FA),         // Blanco Humo #F8F9FA (casi blanco)
-    onBackground = Foreground,              // Gris carbón #2B2D31
+    // ========= Background (SIN CAMBIO) =========
+    background = Color(0xFFF8F9FA),
+    onBackground = Foreground,
 
-    // ========= Surface (Blanco y Beige) =========
-    surface = Surface,                      // Blanco puro #FFFFFF
-    onSurface = Foreground,                 // Gris carbón
-    surfaceVariant = Color(0xFFFFFFFF),     // Blanco puro para variantes también
-    onSurfaceVariant = ForegroundMuted,     // Gris medio
+    // ========= Surface (SIN CAMBIO) =========
+    surface = Surface,
+    onSurface = Foreground,
+    surfaceVariant = Color(0xFFFFFFFF),
+    onSurfaceVariant = ForegroundMuted,
 
-    // ========= Outline (Borders) =========
-    outline = Border,                       // Marrón claro #D4C4B0
-    outlineVariant = Beige,                 // Beige suave
+    // ========= Outline (SIN CAMBIO) =========
+    outline = Border,
+    outlineVariant = Beige,
 
-    // ========= Inverse (Para snackbars, etc) =========
-    inverseSurface = ForestGreen,           // Verde bosque
+    // ========= Inverse (MORA DO) =========
+    inverseSurface = ForestPurple,          // ForestPurple #6A1B9A ✅
     inverseOnSurface = Color.White,
-    inversePrimary = MintGreen,             // Verde menta
+    inversePrimary = MintPurple,            // MintPurple #BA68C8 ✅
 
     // ========= Otros =========
-    surfaceTint = MintGreen,
+    surfaceTint = MintPurple,               // MintPurple ✅
     scrim = Color.Black.copy(alpha = 0.32f)
 )
 
 /**
- * Esquema de colores Dark - SaborLocal
- *
- * Modo oscuro con tonos cálidos que mantienen la identidad de marca.
+ * Esquema de colores Dark - SaborLocal (MORA DO)
  */
 private val DarkColorScheme = darkColorScheme(
     // ========= Primary =========
-    primary = MintGreen,                    // Verde menta más brillante
+    primary = MintPurple,                   // MintPurple más brillante ✅
     onPrimary = CharcoalGray,
-    primaryContainer = ForestGreen,         // Verde bosque oscuro
-    onPrimaryContainer = LightGreen,
+    primaryContainer = ForestPurple,        // ForestPurple oscuro ✅
+    onPrimaryContainer = LightPurple,       // LightPurple ✅
 
     // ========= Secondary =========
-    secondary = SkyBlue,                    // Azul cielo más brillante
+    secondary = SkyBlue,
     onSecondary = CharcoalGray,
-    secondaryContainer = Color(0xFF1565C0), // Azul oscuro
+    secondaryContainer = Color(0xFF1565C0),
     onSecondaryContainer = LightBlue,
 
     // ========= Tertiary =========
-    tertiary = MintGreen,
+    tertiary = MintPurple,                  // MintPurple ✅
     onTertiary = CharcoalGray,
-    tertiaryContainer = LeafGreen,
-    onTertiaryContainer = PaleGreen,
+    tertiaryContainer = LeafPurple,         // LeafPurple ✅
+    onTertiaryContainer = PalePurple,       // PalePurple ✅
 
-    // ========= Error =========
+    // ========= Error (SIN CAMBIO) =========
     error = Destructive,
     onError = Color.White,
-    errorContainer = Color(0xFF8B0000),     // Rojo oscuro
+    errorContainer = Color(0xFF8B0000),
     onErrorContainer = DestructiveLight,
 
-    // ========= Background =========
-    background = Color(0xFF1A1A1A),         // Casi negro cálido
+    // ========= Background (SIN CAMBIO) =========
+    background = Color(0xFF1A1A1A),
     onBackground = CreamBackground,
 
-    // ========= Surface =========
-    surface = Color(0xFF242424),            // Gris oscuro cálido
+    // ========= Surface (SIN CAMBIO) =========
+    surface = Color(0xFF242424),
     onSurface = CreamBackground,
     surfaceVariant = Color(0xFF3A3A3A),
     onSurfaceVariant = Beige,
 
-    // ========= Outline =========
+    // ========= Outline (SIN CAMBIO) =========
     outline = MediumBrown,
     outlineVariant = EarthBrown,
 
-    // ========= Inverse =========
+    // ========= Inverse (MORA DO) =========
     inverseSurface = CreamSurface,
     inverseOnSurface = CharcoalGray,
-    inversePrimary = ForestGreen,
+    inversePrimary = ForestPurple,          // ForestPurple ✅
 
     // ========= Otros =========
-    surfaceTint = MintGreen,
+    surfaceTint = MintPurple,               // MintPurple ✅
     scrim = Color.Black.copy(alpha = 0.32f)
 )
 
-/**
- * Shapes - Esquinas redondeadas inspiradas en productos naturales
- *
- * Bordes suaves que evocan la forma orgánica de frutas y verduras.
- */
+// Shapes (SIN CAMBIO - Perfecto)
 val Shapes = Shapes(
-    extraSmall = RoundedCornerShape(6.dp),   // Bordes sutiles
-    small = RoundedCornerShape(8.dp),        // Cards pequeños
-    medium = RoundedCornerShape(12.dp),      // Cards normales
-    large = RoundedCornerShape(16.dp),       // Cards grandes, imágenes
-    extraLarge = RoundedCornerShape(24.dp)   // Modales, sheets
+    extraSmall = RoundedCornerShape(6.dp),
+    small = RoundedCornerShape(8.dp),
+    medium = RoundedCornerShape(12.dp),
+    large = RoundedCornerShape(16.dp),
+    extraLarge = RoundedCornerShape(24.dp)
 )
 
 /**
- * Tema principal de SaborLocal
- *
- * **Características del diseño:**
- * - Colores cálidos y naturales que evocan productos frescos
- * - Verde principal para transmitir sostenibilidad y frescura
- * - Naranja/terracota para crear calidez y energía local
- * - Cremas y beiges para fondos acogedores y naturales
- * - Marrones tierra para autenticidad y conexión con productores
- *
- * **Psicología aplicada:**
- * - Verde → Confianza en productos orgánicos y saludables
- * - Naranja → Accesibilidad y entusiasmo por apoyar lo local
- * - Crema → Simplicidad y autenticidad artesanal
- * - Tierra → Estabilidad y conexión directa con la fuente
- *
- * @param darkTheme Si debe usar el tema oscuro
- * @param content Contenido de la app
+ * Tema principal de SaborLocal (MORA DO)
  */
 @Composable
 fun MiAppModularTheme(
