@@ -3,41 +3,6 @@ package com.example.saborlocalspa.data.remote.dto
 import com.google.gson.annotations.SerializedName
 
 /**
- * Data Transfer Object que representa la respuesta del servidor de autenticación.
- *
- * Esta clase encapsula la información devuelta por la API de Xano tras un
- * login o registro exitoso. Contiene el token de autenticación JWT y los
- * datos básicos del usuario autenticado.
- *
- * Todas las propiedades son nullable para manejar respuestas parciales o
- * errores del servidor de forma segura.
- *
- * Ejemplo de respuesta JSON:
- * ```json
- * {
- *   "authToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
- *   "id": 123,
- *   "name": "Juan Pérez",
- *   "email": "juan.perez@example.com",
- *   "created_at": 1704067200000
- * }
- * ```
- *
- * Ejemplo de uso:
- * ```kotlin
- * val response = authApiService.login(loginRequest)
- * if (response.isSuccessful) {
- *     val authResponse = response.body()
- *     authResponse?.authToken?.let { token ->
- *         // Guardar token y proceder con la sesión
- *         sessionManager.saveUserSession(
- *             userId = authResponse.id.toString(),
- *             email = authResponse.email ?: "",
- *             name = authResponse.name ?: "",
- *             rememberMe = true
- *         )
- *     }
- * }
  * ```
  *
  * @property authToken Token JWT de autenticación. Se usa para autorizar peticiones

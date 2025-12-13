@@ -3,28 +3,6 @@ package com.example.saborlocalspa.data.remote.dto
 import com.google.gson.annotations.SerializedName
 
 /**
- * Data Transfer Object para la autenticación de usuarios existentes.
- *
- * Esta clase representa el cuerpo de la petición HTTP enviada al endpoint
- * de login de la API de Xano. Contiene las credenciales necesarias para
- * autenticar un usuario y obtener un token de sesión.
- *
- * Ejemplo de uso:
- * ```kotlin
- * val request = LoginRequest(
- *     email = "usuario@example.com",
- *     password = "MiPassword123!"
- * )
- * val response = authApiService.login(request)
- * ```
- *
- * Estructura JSON enviada:
- * ```json
- * {
- *   "email": "usuario@example.com",
- *   "password": "MiPassword123!"
- * }
- * ```
  *
  * @property email Dirección de correo electrónico del usuario registrado.
  *                 Debe ser un email válido y existente en el sistema.

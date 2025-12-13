@@ -46,15 +46,3 @@
 @file:JvmName("ShadcnComponents")
 
 package com.example.saborlocalspa.ui.components
-
-// Este archivo actúa como módulo de re-exportación.
-// Todos los componentes individuales están en sus propios archivos:
-// - Button.kt → ShadcnButton
-// - Input.kt → ShadcnInput
-// - Textarea.kt → ShadcnTextarea
-// - Card.kt → ShadcnCard
-// - Badge.kt → ShadcnBadge
-// - Divider.kt → ShadcnDivider
-// - Snackbar.kt → ShadcnSnackbar
-
-// Las variantes están en: ui/theme/ComponentVariants.kt y ui/theme/SnackbarVariant.kt

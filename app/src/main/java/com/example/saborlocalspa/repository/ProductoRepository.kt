@@ -15,31 +15,11 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 
-/**
- * Repositorio para gestionar operaciones relacionadas con Productos
- *
- * Este repositorio actúa como capa de abstracción entre el API y el ViewModel,
- * encapsulando la lógica de red y transformación de datos.
- *
- * **Arquitectura simple:**
- * Accede directamente a RetrofitClient para obtener el API service.
- *
- * Responsabilidades:
- * - Realizar llamadas al API usando Retrofit
- * - Convertir DTOs a modelos de dominio usando Mappers
- * - Manejar errores y retornar Results
- * - Ejecutar operaciones en el thread correcto (IO para red)
- */
 class ProductoRepository {
 
     // Acceso directo al API service desde RetrofitClient
     private val apiService = RetrofitClient.saborLocalProductoApiService
 
-    /**
-     * Obtiene la lista de todos los productos con sus productores
-     *
-     * @return Result con la lista de productos o error
-     */
     suspend fun getProductos(): ApiResult<List<Producto>> = withContext(Dispatchers.IO) {
         try {
             val response = apiService.getProductos()
@@ -61,12 +41,6 @@ class ProductoRepository {
         }
     }
 
-    /**
-     * Obtiene un producto específico por ID
-     *
-     * @param id ID del producto
-     * @return Result con el producto o error
-     */
     suspend fun getProducto(id: String): ApiResult<Producto> = withContext(Dispatchers.IO) {
         try {
             val response = apiService.getProducto(id)
@@ -88,15 +62,6 @@ class ProductoRepository {
         }
     }
 
-    /**
-     * Obtiene el catálogo de productos de un productor específico
-     *
-     * **Endpoint clave para EP3:** GET /api/producto/productor/{productorId}
-     * Este endpoint retorna todos los productos que ofrece un productor.
-     *
-     * @param productorId ID del productor
-     * @return Result con la lista de productos del productor o error
-     */
     suspend fun getProductosByProductor(productorId: String): ApiResult<List<Producto>> = withContext(Dispatchers.IO) {
         try {
             val response = apiService.getProductosByProductor(productorId)
@@ -118,17 +83,6 @@ class ProductoRepository {
         }
     }
 
-    /**
-     * Crea un nuevo producto
-     *
-     * @param nombre Nombre del producto
-     * @param descripcion Descripción del producto
-     * @param precio Precio del producto
-     * @param unidad Unidad de medida (kg, litro, unidad, etc.)
-     * @param stock Cantidad en stock
-     * @param productorId ID del productor
-     * @return Result con el producto creado o error
-     */
     suspend fun createProducto(
         nombre: String,
         descripcion: String,
@@ -170,16 +124,6 @@ class ProductoRepository {
         }
     }
 
-    /**
-     * Actualiza un producto existente
-     *
-     * @param id ID del producto
-     * @param nombre Nuevo nombre (opcional)
-     * @param descripcion Nueva descripción (opcional)
-     * @param precio Nuevo precio (opcional)
-     * @param stock Nuevo stock (opcional)
-     * @return Result con el producto actualizado o error
-     */
     suspend fun updateProducto(
         id: String,
         nombre: String? = null,
@@ -218,12 +162,6 @@ class ProductoRepository {
         }
     }
 
-    /**
-     * Elimina un producto
-     *
-     * @param id ID del producto
-     * @return Result con éxito o error
-     */
     suspend fun deleteProducto(id: String): ApiResult<Unit> = withContext(Dispatchers.IO) {
         try {
             val response = apiService.deleteProducto(id)
@@ -239,13 +177,6 @@ class ProductoRepository {
         }
     }
 
-    /**
-     * Sube una imagen para un producto
-     *
-     * @param id ID del producto
-     * @param imageFile Archivo de imagen
-     * @return Result con el producto actualizado o error
-     */
     suspend fun uploadImage(id: String, imageFile: File): ApiResult<Producto> = withContext(Dispatchers.IO) {
         try {
             val requestBody = imageFile.asRequestBody("image/*".toMediaTypeOrNull())

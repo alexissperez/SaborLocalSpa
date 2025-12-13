@@ -80,7 +80,7 @@ fun SplashScreen(
             )
 
             Text(
-                text = "Productos frescos de tu región",
+                text = "Los mejores productos, con la mejor calidad",
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                 ),

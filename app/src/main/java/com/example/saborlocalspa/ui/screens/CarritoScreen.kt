@@ -29,19 +29,7 @@ import androidx.compose.ui.graphics.Color
 import com.example.saborlocalspa.data.local.CarritoManager
 import com.example.saborlocalspa.viewmodel.CarritoViewModel
 
-/**
- * Pantalla del carrito de compras
- *
- * **Flujo del cliente:**
- * 1. Cliente agrega productos desde ProductorDetalleScreen
- * 2. Ve su carrito en esta pantalla
- * 3. Puede editar cantidades o eliminar productos
- * 4. Va al checkout para confirmar el pedido
- *
- * @param viewModel ViewModel del carrito
- * @param onNavigateBack Callback para volver atrás
- * @param onNavigateToCheckout Callback para ir al checkout
- */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CarritoScreen(

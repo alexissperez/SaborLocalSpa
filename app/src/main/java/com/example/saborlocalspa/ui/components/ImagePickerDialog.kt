@@ -13,49 +13,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.saborlocalspa.ui.theme.*
 
-/**
- * Diálogo de selección de imagen con opciones de Cámara y Galería.
- *
- * **Funcionalidad:**
- * - Muestra un AlertDialog con dos opciones: Cámara y Galería
- * - Cada opción incluye un icono representativo y texto descriptivo
- * - Botón de cancelar para cerrar el diálogo
- * - Diseño consistente con shadcn.io theme
- *
- * **Casos de uso:**
- * - Selección de avatar en perfil de usuario
- * - Subida de imágenes en formularios
- * - Cualquier flujo que requiera captura o selección de imágenes
- *
- * **Patrón de diseño:**
- * Usa callbacks para delegar las acciones al componente padre,
- * manteniendo este componente sin lógica de negocio (presentational).
- *
- * **Ejemplo de uso:**
- * ```kotlin
- * var showDialog by remember { mutableStateOf(false) }
- *
- * if (showDialog) {
- *     ImagePickerDialog(
- *         onDismiss = { showDialog = false },
- *         onCameraClick = {
- *             showDialog = false
- *             launchCamera()
- *         },
- *         onGalleryClick = {
- *             showDialog = false
- *             launchGallery()
- *         }
- *     )
- * }
- * ```
- *
- * @param onDismiss Callback ejecutado al cancelar o cerrar el diálogo
- * @param onCameraClick Callback ejecutado al seleccionar la opción de Cámara
- * @param onGalleryClick Callback ejecutado al seleccionar la opción de Galería
- *
- * @see ProfileScreen
- */
 @Composable
 fun ImagePickerDialog(
     onDismiss: () -> Unit,
@@ -119,28 +76,7 @@ fun ImagePickerDialog(
     )
 }
 
-/**
- * Opción individual del selector de imagen.
- *
- * Componente interno reutilizable que representa una opción seleccionable
- * dentro del ImagePickerDialog. Muestra un icono, título y descripción.
- *
- * **Diseño:**
- * - Card clickeable con efecto de elevación al hover
- * - Icono grande (48.dp) en color Primary
- * - Título en titleMedium Bold
- * - Descripción en bodySmall Muted
- * - Layout horizontal con espaciado consistente
- *
- * **Accesibilidad:**
- * El Card es clickeable y responde a gestos táctiles,
- * proporcionando feedback visual al usuario.
- *
- * @param icon Icono Material que representa la opción
- * @param title Título de la opción (ej: "Tomar foto")
- * @param description Descripción breve de la acción
- * @param onClick Callback ejecutado al hacer clic en la opción
- */
+
 @Composable
 private fun ImagePickerOption(
     icon: ImageVector,

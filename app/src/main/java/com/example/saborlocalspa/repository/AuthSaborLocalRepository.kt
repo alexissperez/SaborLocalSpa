@@ -8,17 +8,6 @@ import com.example.saborlocalspa.model.ApiResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-/**
- * Repository para autenticación con SaborLocal API
- *
- * Maneja login, registro y persistencia de sesión.
- * Usa TokenManager de RetrofitClient para gestión segura de tokens.
- *
- * **Arquitectura simple:**
- * Este repository accede directamente a RetrofitClient (singleton)
- * para obtener el API service y el TokenManager.
- * Esto es más fácil de entender para estudiantes que Dependency Injection.
- */
 class AuthSaborLocalRepository {
 
     // Acceso directo a las dependencias desde RetrofitClient
@@ -104,24 +93,6 @@ class AuthSaborLocalRepository {
         }
     }
 
-    /**
-     * Registro de nuevo usuario (CLIENTE o PRODUCTOR)
-     *
-     * Permite auto-registro de CLIENTE y PRODUCTOR.
-     * El rol determina qué campos son obligatorios:
-     * - CLIENTE: email, password, role, nombre (telefono y direccion opcionales)
-     * - PRODUCTOR: email, password, role, nombre, nombreNegocio (obligatorio), descripcion (opcional)
-     *
-     * @param email Email
-     * @param password Contraseña
-     * @param role Rol del usuario (CLIENTE o PRODUCTOR)
-     * @param nombre Nombre completo (CLIENTE) o nombre de contacto (PRODUCTOR)
-     * @param telefono Teléfono de contacto (opcional)
-     * @param direccion Dirección (opcional)
-     * @param nombreNegocio Nombre del negocio (obligatorio para PRODUCTOR)
-     * @param descripcion Descripción del negocio (opcional para PRODUCTOR)
-     * @return ApiResult con el usuario registrado
-     */
     suspend fun register(
         email: String,
         password: String,
@@ -177,18 +148,7 @@ class AuthSaborLocalRepository {
         }
     }
 
-    /**
-     * Crea un nuevo usuario PRODUCTOR (solo ADMIN)
-     *
-     * Requiere estar autenticado como ADMIN
-     *
-     * @param nombre Nombre del productor
-     * @param email Email del productor
-     * @param password Contraseña inicial
-     * @param ubicacion Ubicación del productor
-     * @param telefono Teléfono del productor
-     * @return ApiResult con el usuario creado
-     */
+
     suspend fun createProductorUser(
         nombre: String,
         email: String,

@@ -6,52 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.saborlocalspa.ui.screens.*
 
-/**
- * Grafo de navegación principal de la aplicación.
- *
- * Define todas las rutas de navegación y las transiciones entre pantallas
- * usando Jetpack Compose Navigation. Coordina el flujo de navegación entre:
- * - Pantallas de autenticación (Login, Register)
- * - Pantallas principales (Home, Profile)
- *
- * **Rutas definidas:**
- * - `"login"` - Pantalla de inicio de sesión (ruta inicial)
- * - `"register"` - Pantalla de registro de nuevos usuarios
- * - `"home"` - Pantalla principal tras autenticación exitosa
- * - `"profile"` - Pantalla de perfil del usuario
- *
- * **Estrategia de backstack:**
- * - Login/Register → Home: Limpia backstack con `popUpTo(...) { inclusive = true }`
- *   para evitar que el botón atrás regrese a login tras autenticarse
- * - Home → Profile: Navegación estándar, puede volver atrás
- * - Logout: Regresa a login y limpia backstack completo
- *
- * **Ejemplo de flujo de navegación:**
- * ```
- * Login → [Usuario se registra] → Register → [Registro exitoso]
- *   ↓ Backstack limpio                              ↓
- * Home → [Ver perfil] → Profile → [Atrás] → Home → [Logout] → Login
- * ```
- *
- * Ejemplo de navegación programática:
- * ```kotlin
- * // Navegar a profile
- * navController.navigate("profile")
- *
- * // Navegar limpiando backstack
- * navController.navigate("home") {
- *     popUpTo("login") { inclusive = true }
- * }
- *
- * // Volver atrás
- * navController.navigateUp()
- * ```
- *
- * @see LoginScreen
- * @see RegisterScreen
- * @see HomeScreen
- * @see ProfileScreen
- */
+
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
@@ -60,13 +15,7 @@ fun AppNavigation() {
         navController = navController,
         startDestination = "splash"
     ) {
-        /**
-         * Ruta: splash
-         *
-         * Pantalla inicial que verifica si hay una sesión activa.
-         * - Si hay token válido → Navega a home
-         * - Si no hay token → Navega a login
-         */
+
         composable("splash") {
             SplashScreen(
                 onNavigateToHome = {

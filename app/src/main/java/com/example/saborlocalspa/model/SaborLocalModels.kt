@@ -1,20 +1,5 @@
 package com.example.saborlocalspa.model
 
-/**
- * Modelos de Dominio para SaborLocal
- *
- * Estos modelos representan las entidades del dominio de negocio.
- * Son independientes de la implementación del API (DTOs) y de la base de datos.
- * Facilitan el testing y permiten cambiar la implementación sin afectar la UI.
- */
-
-/**
- * Modelo de dominio para Productor
- *
- * **IMPORTANTE:** Los campos pueden ser null dependiendo del endpoint:
- * - `/producto` retorna productor parcial (solo _id y telefono)
- * - `/productor-profile` retorna productor completo
- */
 data class Productor(
     val id: String,
     val nombre: String? = null,

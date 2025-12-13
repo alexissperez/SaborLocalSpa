@@ -2,21 +2,6 @@ package com.example.saborlocalspa.data.remote.dto.producto
 
 import com.google.gson.annotations.SerializedName
 
-/**
- * DTO para Producto
- * Representa un producto agrícola que se vende en la plataforma.
- *
- * **Estructura variable según el endpoint:**
- * - `/producto` → `productor` es objeto parcial: `{_id, telefono}`
- * - `/producto/productor/{id}` → `productorId` es String (solo ID)
- *
- * **IMPORTANTE:** El campo `productor` puede ser:
- * - String (solo ID)
- * - Map con {_id, telefono} (objeto parcial)
- * - Map completo con todos los campos (objeto populado)
- *
- * Usamos `Any` para manejar todos los casos.
- */
 data class ProductoDto(
     @SerializedName("_id")
     val id: String,

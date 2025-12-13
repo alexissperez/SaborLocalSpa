@@ -4,29 +4,7 @@ import com.example.saborlocalspa.data.remote.dto.pedido.PedidoDto
 import com.example.saborlocalspa.data.remote.dto.pedido.PedidoItemDto
 import com.example.saborlocalspa.model.*
 
-/**
- * Mappers para convertir DTOs de Pedido a modelos de dominio
- *
- * **Actualizado según la respuesta REAL del backend SaborLocal:**
- * - El backend retorna `cliente` como objeto completo (usando .populate())
- * - Los items tienen solo `producto` (String ID), `cantidad` y `precio`
- * - Usa `items` en vez de `productos`
- * - Usa `createdAt` como fecha del pedido
- *
- * **¿Por qué usamos Mappers?**
- * - Separan la capa de datos (API) de la capa de dominio (ViewModels/UI)
- * - Facilitan el testing al tener modelos limpios
- * - Permiten cambiar el API sin romper la UI
- */
 
-/**
- * Convierte PedidoItemDto a PedidoItem (modelo de dominio)
- *
- * **Nota:** El backend solo retorna el ID del producto en los items del pedido.
- * Creamos un Producto mínimo solo con ID y precio.
- * Para obtener los datos completos (nombre, imagen, etc.) se necesitaría
- * hacer GET /api/producto/{id} por cada producto.
- */
 fun PedidoItemDto.toModel(): PedidoItem {
     // Crear producto mínimo con los datos disponibles (solo ID y precio)
     val productoMinimo = Producto(

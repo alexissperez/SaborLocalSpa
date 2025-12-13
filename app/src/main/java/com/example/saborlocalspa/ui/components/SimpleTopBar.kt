@@ -14,25 +14,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
-/**
- * Barra superior simple y consistente para toda la app
- *
- * **Diseño:**
- * - Fondo blanco (sin TopAppBar de Material que puede aplicar colores propios)
- * - IconButton de navegación a la izquierda
- * - Título centrado
- * - Acción opcional a la derecha
- *
- * **Ventaja:**
- * Este componente garantiza que todas las pantallas tengan la misma cabecera
- * y el mismo color blanco, evitando inconsistencias con la Status Bar.
- *
- * @param title Título de la pantalla
- * @param onNavigateBack Callback para el botón de atrás
- * @param actionIcon Ícono opcional para la acción derecha
- * @param onActionClick Callback opcional para la acción derecha
- * @param actionContent Contenido composable personalizado para la derecha (alternativa a actionIcon)
- */
+
 @Composable
 fun SimpleTopBar(
     title: String,

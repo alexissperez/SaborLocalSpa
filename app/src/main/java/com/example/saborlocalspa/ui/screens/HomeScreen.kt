@@ -27,29 +27,6 @@ import com.example.saborlocalspa.utils.getThumbnailUrl
 import com.example.saborlocalspa.viewmodel.HomeUiState
 import com.example.saborlocalspa.viewmodel.HomeViewModel
 
-/**
- * HomeScreen rediseñado estilo Instagram/Facebook/Amazon
- *
- * **Nueva Arquitectura:**
- * - Bottom Navigation para acceso rápido (5 tabs principales)
- * - Feed moderno con scroll vertical
- * - Secciones horizontales (productores, productos)
- * - Buscador prominente en el header
- *
- * **Estructura:**
- * ```
- * HomeScreen
- * ├── TopBar Simplificado
- * │   ├── Logo "SaborLocal"
- * │   └── Buscador
- * └── LazyColumn (Feed)
- *     ├── Welcome Header
- *     ├── Quick Actions (4 categorías)
- *     ├── Productores Destacados (carrusel horizontal)
- *     ├── Productos Recientes (carrusel horizontal)
- *     └── Todas las Categorías (grid 2 columnas)
- * ```
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -351,15 +328,15 @@ fun HomeScreen(
                     ) {
                         CategoryCard(
                             icon = Icons.Filled.Eco,
-                            title = "Frutas",
-                            count = "120 productos",
+                            title = "Especias",
+                            count = "80 productos",
                             modifier = Modifier.weight(1f),
                             onClick = onNavigateToProductosList
                         )
                         CategoryCard(
                             icon = Icons.Filled.Restaurant,
-                            title = "Verduras",
-                            count = "85 productos",
+                            title = "Conservas",
+                            count = "60 productos",
                             modifier = Modifier.weight(1f),
                             onClick = onNavigateToProductosList
                         )
