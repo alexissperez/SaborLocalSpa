@@ -3,6 +3,7 @@ package com.example.saborlocalspa.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.saborlocalspa.data.local.TokenManager
 import com.example.saborlocalspa.model.Producto
 import com.example.saborlocalspa.model.ApiResult
 import com.example.saborlocalspa.model.Productor
@@ -13,28 +14,31 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-/**
- * ViewModel para HomeScreen
- *
- * Gestiona la carga de datos iniciales para la pantalla de inicio:
- * - Productos destacados/recientes
- * - Productores destacados
- */
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val productoRepository = ProductoRepository()
     private val productorRepository = ProductorRepository()
+    private val tokenManager = TokenManager(application)
 
-    // Estado de productos destacados (recientes)
     private val _recentProducts = MutableStateFlow<HomeUiState<List<Producto>>>(HomeUiState.Loading)
     val recentProducts: StateFlow<HomeUiState<List<Producto>>> = _recentProducts.asStateFlow()
 
-    // Estado de productores destacados
     private val _featuredProductores = MutableStateFlow<HomeUiState<List<Productor>>>(HomeUiState.Loading)
     val featuredProductores: StateFlow<HomeUiState<List<Productor>>> = _featuredProductores.asStateFlow()
 
+    // Rol actual del usuario (CLIENTE, PRODUCTOR, ADMIN, REPARTIDOR...)
+    private val _currentRole = MutableStateFlow<String?>(null)
+    val currentRole: StateFlow<String?> = _currentRole.asStateFlow()
+
     init {
+        loadUserRole()
         loadHomeData()
+    }
+
+    private fun loadUserRole() {
+        // TokenManager es síncrono, se puede leer directo
+        val user = tokenManager.getCurrentUser()
+        _currentRole.value = user?.role
     }
 
     fun loadHomeData() {
@@ -47,7 +51,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             when (val result = productoRepository.getProductos()) {
                 is ApiResult.Success -> {
-                    // Tomamos los primeros 10 productos como "recientes" o "destacados"
                     val products = result.data.take(10)
                     _recentProducts.value = HomeUiState.Success(products)
                 }
@@ -63,7 +66,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             when (val result = productorRepository.getProductores()) {
                 is ApiResult.Success -> {
-                    // Tomamos los primeros 5 productores como "destacados"
                     val productores = result.data.take(5)
                     _featuredProductores.value = HomeUiState.Success(productores)
                 }
@@ -75,9 +77,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 }
 
-/**
- * Estados posibles de la UI en HomeScreen
- */
 sealed class HomeUiState<out T> {
     object Loading : HomeUiState<Nothing>()
     data class Success<T>(val data: T) : HomeUiState<T>()

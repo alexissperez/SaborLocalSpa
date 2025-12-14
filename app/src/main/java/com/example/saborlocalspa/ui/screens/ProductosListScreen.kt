@@ -6,11 +6,11 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,22 +24,23 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.saborlocalspa.data.local.CarritoManager
 import com.example.saborlocalspa.model.Producto
 import com.example.saborlocalspa.ui.components.FiltersBottomSheet
 import com.example.saborlocalspa.ui.components.ProductDetailSheet
 import com.example.saborlocalspa.ui.components.StandardScaffold
+import com.example.saborlocalspa.viewmodel.ProductoViewModel
 import com.example.saborlocalspa.viewmodel.ProductosListUiState
 import com.example.saborlocalspa.viewmodel.ProductosListViewModel
 
-/**
- * Pantalla de lista de productos con filtros
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductosListScreen(
     viewModel: ProductosListViewModel = viewModel(),
+    productoViewModel: ProductoViewModel = viewModel(),
     onNavigateBack: () -> Unit,
-    onProductClick: (String) -> Unit = {}
+    onProductClick: (String) -> Unit = {},
+    currentRole: String = ""          // para saber si es PRODUCTOR / ADMIN
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -49,26 +50,41 @@ fun ProductosListScreen(
 
     var showFilters by remember { mutableStateOf(false) }
     var showProductorMenu by remember { mutableStateOf(false) }
-    
+
     // Estado para el detalle de producto (Bottom Sheet)
     var selectedProduct by remember { mutableStateOf<Producto?>(null) }
 
     val context = androidx.compose.ui.platform.LocalContext.current
 
-    // Bottom Sheet de detalle
+// Bottom Sheet de detalle (ACTUALIZADO)
     if (selectedProduct != null) {
+        val esProductor =
+            currentRole.equals("PRODUCTOR", ignoreCase = true) ||
+                    currentRole.equals("Productor", ignoreCase = true) ||
+                    currentRole.equals("ADMIN", ignoreCase = true)
+
         ProductDetailSheet(
             producto = selectedProduct!!,
+            esProductor = esProductor,
             onDismissRequest = { selectedProduct = null },
             onAddToCart = { producto ->
-                com.example.saborlocalspa.data.local.CarritoManager.addItem(producto)
+                CarritoManager.addItem(producto)
                 android.widget.Toast.makeText(
                     context,
                     "Producto agregado al carrito",
                     android.widget.Toast.LENGTH_SHORT
                 ).show()
                 selectedProduct = null
-                // Opcional: Navegar al carrito o mostrar snackbar
+            },
+            onDelete = { producto ->
+                productoViewModel.deleteProducto(producto.id)
+                viewModel.loadProductos()   // recarga la lista del grid
+                android.widget.Toast.makeText(
+                    context,
+                    "Producto eliminado",
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+                selectedProduct = null
             }
         )
     }
@@ -78,7 +94,6 @@ fun ProductosListScreen(
         FiltersBottomSheet(
             onDismissRequest = { showFilters = false },
             onApplyFilters = {
-                // viewModel.applyFilters() // Assuming apply happens reactively or here
                 showFilters = false
             },
             minPrice = minPrice,
@@ -94,7 +109,6 @@ fun ProductosListScreen(
         title = "Productos",
         onNavigateBack = onNavigateBack,
         actionContent = {
-            // Acciones: Filtros + Refresh
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { showFilters = !showFilters }) {
                     Icon(
@@ -206,19 +220,23 @@ fun ProductosListScreen(
 
                 is ProductosListUiState.Success -> {
                     Column(modifier = Modifier.fillMaxSize()) {
-                        // Título estilo "1001 Products Are Available"
                         Text(
                             text = "${state.productos.size} Productos\nDisponibles",
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                            lineHeight = MaterialTheme.typography.headlineMedium.fontSize * 1.1
+                            lineHeight = MaterialTheme.typography.headlineMedium.fontSize * 1.1f
                         )
 
                         LazyVerticalGrid(
                             columns = GridCells.Fixed(2),
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 100.dp),
+                            contentPadding = PaddingValues(
+                                top = 16.dp,
+                                start = 16.dp,
+                                end = 16.dp,
+                                bottom = 100.dp
+                            ),
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
@@ -248,7 +266,7 @@ fun ProductoCardGrid(
             .shadow(
                 elevation = 4.dp,
                 shape = RoundedCornerShape(24.dp),
-                spotColor = Color(0x1A000000) // Sombra muy suave
+                spotColor = Color(0x1A000000)
             ),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
@@ -258,13 +276,11 @@ fun ProductoCardGrid(
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
-            // Contenedor de Imagen y Favorito
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(1f) // Relación de aspecto cuadrada 1:1
+                    .aspectRatio(1f)
             ) {
-                // Botón Favorito (Visual)
                 Icon(
                     imageVector = Icons.Outlined.FavoriteBorder,
                     contentDescription = "Favorito",
@@ -274,21 +290,19 @@ fun ProductoCardGrid(
                         .size(24.dp)
                 )
 
-                // Imagen del producto
                 AsyncImage(
                     model = producto.imagenThumbnail ?: producto.imagen,
                     contentDescription = producto.nombre,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = 16.dp, bottom = 8.dp) // Espacio para el icono
+                        .padding(top = 16.dp, bottom = 8.dp)
                         .clip(RoundedCornerShape(16.dp)),
-                    contentScale = ContentScale.Fit // Fit para ver el producto completo como en la ref
+                    contentScale = ContentScale.Fit
                 )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Información del producto
             Column {
                 Text(
                     text = producto.nombre,
@@ -298,7 +312,7 @@ fun ProductoCardGrid(
                     overflow = TextOverflow.Ellipsis,
                     color = Color(0xFF1A1A1A)
                 )
-                
+
                 Text(
                     text = producto.productor.getDisplayName(),
                     style = MaterialTheme.typography.bodySmall,
@@ -309,20 +323,18 @@ fun ProductoCardGrid(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Precio y Botón de compra
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "$${producto.precio.toInt()}", // Precio entero para estilo limpio
+                        text = "$${producto.precio.toInt()}",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
 
-                    // Botón "Bag" pequeño
                     Surface(
                         shape = CircleShape,
                         color = if (producto.stock > 0) MaterialTheme.colorScheme.primary else Color.LightGray,

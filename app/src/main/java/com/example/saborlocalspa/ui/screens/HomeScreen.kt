@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -12,20 +11,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.layout.ContentScale
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
 import com.example.saborlocalspa.model.Producto
 import com.example.saborlocalspa.ui.components.*
-import com.example.saborlocalspa.utils.getImagenUrl
-import com.example.saborlocalspa.utils.getThumbnailUrl
 import com.example.saborlocalspa.viewmodel.HomeUiState
 import com.example.saborlocalspa.viewmodel.HomeViewModel
+import com.example.saborlocalspa.viewmodel.ProductoViewModel
+import androidx.compose.ui.platform.LocalContext
+import com.example.saborlocalspa.data.local.CarritoManager
+import android.widget.Toast
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,36 +39,51 @@ fun HomeScreen(
     onLogout: () -> Unit = {}
 ) {
     var searchQuery by remember { mutableStateOf("") }
-    
-    // Estado de datos
+
     val recentProductsState by viewModel.recentProducts.collectAsState()
     val featuredProductoresState by viewModel.featuredProductores.collectAsState()
+    val currentRole by viewModel.currentRole.collectAsState()
 
-    // Estado para el detalle de producto (Bottom Sheet)
     var selectedProduct by remember { mutableStateOf<Producto?>(null) }
+    val context = LocalContext.current
 
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val productoViewModel: ProductoViewModel = viewModel()
 
-    // Bottom Sheet de detalle
+    // Bottom sheet de detalle de producto
     if (selectedProduct != null) {
+        val esProductor =
+            currentRole?.equals("PRODUCTOR", ignoreCase = true) == true ||
+                    currentRole?.equals("Productor", ignoreCase = true) == true ||
+                    currentRole?.equals("ADMIN", ignoreCase = true) == true
+
         ProductDetailSheet(
             producto = selectedProduct!!,
+            esProductor = esProductor,
             onDismissRequest = { selectedProduct = null },
             onAddToCart = { producto ->
-                com.example.saborlocalspa.data.local.CarritoManager.addItem(producto)
-                android.widget.Toast.makeText(
+                CarritoManager.addItem(producto)
+                Toast.makeText(
                     context,
                     "Producto agregado al carrito",
-                    android.widget.Toast.LENGTH_SHORT
+                    Toast.LENGTH_SHORT
+                ).show()
+                selectedProduct = null
+            },
+            onDelete = { producto ->
+                productoViewModel.deleteProducto(producto.id)
+                Toast.makeText(
+                    context,
+                    "Producto eliminado",
+                    Toast.LENGTH_SHORT
                 ).show()
                 selectedProduct = null
             }
         )
     }
 
+
     Scaffold(
         topBar = {
-            // TopBar Minimalista con Buscador
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.surface,
@@ -83,7 +94,6 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    // Logo y título
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -105,11 +115,10 @@ fun HomeScreen(
                             )
                         }
 
-                        // Notificaciones (futuro)
-                        IconButton(onClick = { /* TODO: Notifications */ }) {
+                        IconButton(onClick = onNavigateToProfile) {
                             Icon(
-                                imageVector = Icons.Filled.Notifications,
-                                contentDescription = "Notificaciones",
+                                imageVector = Icons.Filled.Person,
+                                contentDescription = "Perfil",
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -117,7 +126,6 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Buscador
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
@@ -149,9 +157,9 @@ fun HomeScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues),
-            contentPadding = PaddingValues(bottom = 100.dp) // Espacio para Bottom Nav
+            contentPadding = PaddingValues(bottom = 100.dp)
         ) {
-            // ========= WELCOME HEADER =========
+            // HEADER
             item {
                 Column(
                     modifier = Modifier
@@ -168,10 +176,18 @@ fun HomeScreen(
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    currentRole?.let { role ->
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Rol actual: $role",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
 
-            // ========= QUICK ACTIONS =========
+            // ACCIONES RÁPIDAS COMUNES
             item {
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
@@ -194,22 +210,68 @@ fun HomeScreen(
                     }
                     item {
                         QuickActionChip(
-                            icon = Icons.Filled.LocalOffer,
-                            label = "Ofertas",
-                            onClick = { /* TODO */ }
+                            icon = Icons.Filled.ShoppingBag,
+                            label = "Carrito",
+                            onClick = onNavigateToCarrito
                         )
                     }
                     item {
                         QuickActionChip(
-                            icon = Icons.Filled.Category,
-                            label = "Categorías",
-                            onClick = { /* TODO */ }
+                            icon = Icons.Filled.ReceiptLong,
+                            label = "Mis pedidos",
+                            onClick = onNavigateToPedidos
                         )
                     }
                 }
             }
 
-            // ========= PRODUCTORES DESTACADOS =========
+            // ACCIONES ESPECIALES SEGÚN ROL (PRODUCTOR / ADMIN)
+            if (currentRole?.equals("PRODUCTOR", true) == true ||
+                currentRole?.equals("ADMIN", true) == true
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Text(
+                            text = "Acciones de productor",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            item {
+                                QuickActionChip(
+                                    icon = Icons.Filled.AddCircle,
+                                    label = "Crear producto",
+                                    onClick = onNavigateToCreateProducto
+                                )
+                            }
+                            item {
+                                QuickActionChip(
+                                    icon = Icons.Filled.PersonAdd,
+                                    label = "Crear productor",
+                                    onClick = onNavigateToCreateProductor
+                                )
+                            }
+                            item {
+                                QuickActionChip(
+                                    icon = Icons.Filled.Inventory,     // cajas / inventario
+                                    label = "Mis productos",
+                                    onClick = onNavigateToProductosList
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // PRODUCTORES DESTACADOS
             item {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     SectionHeader(
@@ -217,7 +279,6 @@ fun HomeScreen(
                         actionText = "Ver todos",
                         onActionClick = onNavigateToProductoresList
                     )
-
                     when (featuredProductoresState) {
                         is HomeUiState.Loading -> {
                             Box(
@@ -237,8 +298,8 @@ fun HomeScreen(
                             )
                         }
                         is HomeUiState.Success -> {
-                            val productores = (featuredProductoresState as HomeUiState.Success<List<com.example.saborlocalspa.model.Productor>>).data
-
+                            val productores =
+                                (featuredProductoresState as HomeUiState.Success<List<com.example.saborlocalspa.model.Productor>>).data
                             LazyRow(
                                 modifier = Modifier.fillMaxWidth(),
                                 contentPadding = PaddingValues(horizontal = 16.dp),
@@ -257,16 +318,15 @@ fun HomeScreen(
                 }
             }
 
-            // ========= PRODUCTOS RECIENTES =========
+            // PRODUCTOS RECIENTES
             item {
                 Spacer(modifier = Modifier.height(24.dp))
                 Column(modifier = Modifier.fillMaxWidth()) {
                     SectionHeader(
-                        title = "Productos Frescos",
+                        title = "Productos",
                         actionText = "Ver todos",
                         onActionClick = onNavigateToProductosList
                     )
-
                     when (recentProductsState) {
                         is HomeUiState.Loading -> {
                             Box(
@@ -286,8 +346,8 @@ fun HomeScreen(
                             )
                         }
                         is HomeUiState.Success -> {
-                            val productos = (recentProductsState as HomeUiState.Success<List<Producto>>).data
-                            
+                            val productos =
+                                (recentProductsState as HomeUiState.Success<List<Producto>>).data
                             LazyRow(
                                 modifier = Modifier.fillMaxWidth(),
                                 contentPadding = PaddingValues(horizontal = 16.dp),
@@ -306,7 +366,7 @@ fun HomeScreen(
                 }
             }
 
-            // ========= CATEGORÍAS =========
+// CATEGORÍAS
             item {
                 Spacer(modifier = Modifier.height(24.dp))
                 Column(
@@ -321,7 +381,7 @@ fun HomeScreen(
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
 
-                    // Grid 2x2 de categorías
+                    // Fila 1
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -334,9 +394,9 @@ fun HomeScreen(
                             onClick = onNavigateToProductosList
                         )
                         CategoryCard(
-                            icon = Icons.Filled.Restaurant,
-                            title = "Conservas",
-                            count = "60 productos",
+                            icon = Icons.Filled.BreakfastDining,
+                            title = "Mermeladas",
+                            count = "30 productos",
                             modifier = Modifier.weight(1f),
                             onClick = onNavigateToProductosList
                         )
@@ -344,21 +404,46 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    // Fila 2
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         CategoryCard(
-                            icon = Icons.Filled.Fastfood,
+                            icon = Icons.Filled.BreakfastDining,
                             title = "Lácteos",
                             count = "45 productos",
                             modifier = Modifier.weight(1f),
                             onClick = onNavigateToProductosList
                         )
+
                         CategoryCard(
-                            icon = Icons.Filled.Cake,
+                            icon = Icons.Filled.LocalCafe,      // ícono de café
+                            title = "Café",
+                            count = "20 productos",
+                            modifier = Modifier.weight(1f),
+                            onClick = onNavigateToProductosList
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Fila 3
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        CategoryCard(
+                            icon = Icons.Filled.BakeryDining,
                             title = "Panadería",
                             count = "60 productos",
+                            modifier = Modifier.weight(1f),
+                            onClick = onNavigateToProductosList
+                        )
+                        CategoryCard(
+                            icon = Icons.Filled.RiceBowl,
+                            title = "Frutos secos",
+                            count = "25 productos",
                             modifier = Modifier.weight(1f),
                             onClick = onNavigateToProductosList
                         )
@@ -366,280 +451,7 @@ fun HomeScreen(
                 }
             }
 
-            // Espaciado final
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-        }
-    }
-}
-
-// ==================== COMPONENTES NUEVOS ====================
-
-@Composable
-fun SectionHeader(
-    title: String,
-    actionText: String,
-    onActionClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
-        TextButton(onClick = onActionClick) {
-            Text(
-                text = actionText,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Medium
-            )
-            Icon(
-                imageVector = Icons.Filled.ArrowForward,
-                contentDescription = null,
-                modifier = Modifier.size(16.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
-    }
-}
-
-@Composable
-fun QuickActionChip(
-    icon: ImageVector,
-    label: String,
-    onClick: () -> Unit
-) {
-    Surface(
-        onClick = onClick,
-        shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.primaryContainer,
-        modifier = Modifier.height(40.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.size(20.dp)
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                fontWeight = FontWeight.Medium
-            )
-        }
-    }
-}
-
-@Composable
-fun ProductorCard(
-    productor: com.example.saborlocalspa.model.Productor,
-    onClick: () -> Unit
-) {
-    ShadcnCard(
-        onClick = onClick,
-        modifier = Modifier
-            .width(160.dp)
-            .height(200.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Avatar del productor con imagen real o placeholder
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-                    .align(Alignment.CenterHorizontally),
-                contentAlignment = Alignment.Center
-            ) {
-                if (productor.imagen != null) {
-                    AsyncImage(
-                        model = productor.getThumbnailUrl() ?: productor.getImagenUrl(),
-                        contentDescription = productor.nombre,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Filled.Person,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(40.dp)
-                    )
-                }
-            }
-
-            Column {
-                Text(
-                    text = productor.getDisplayName(),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.LocationOn,
-                        contentDescription = null,
-                        modifier = Modifier.size(12.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = productor.ubicacion ?: "Sin ubicación",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Phone,
-                        contentDescription = null,
-                        modifier = Modifier.size(12.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = productor.telefono ?: "Sin teléfono",
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun HomeProductoCard(
-    producto: Producto,
-    onClick: () -> Unit
-) {
-    ShadcnCard(
-        onClick = onClick,
-        modifier = Modifier
-            .width(140.dp)
-            .height(200.dp)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Imagen del producto
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                if (producto.imagen != null) {
-                    AsyncImage(
-                        model = producto.getThumbnailUrl() ?: producto.getImagenUrl(),
-                        contentDescription = producto.nombre,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Filled.ShoppingBag,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(48.dp)
-                    )
-                }
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = producto.nombre,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = producto.getPrecioFormateado(),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = producto.productor.getDisplayName(),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun CategoryCard(
-    icon: ImageVector,
-    title: String,
-    count: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    ShadcnCard(
-        onClick = onClick,
-        modifier = modifier.height(120.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(32.dp)
-            )
-            Column {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = count,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            item { Spacer(modifier = Modifier.height(24.dp)) }
         }
     }
 }

@@ -24,8 +24,10 @@ import com.example.saborlocalspa.utils.getImagenUrl
 @Composable
 fun ProductDetailSheet(
     producto: Producto,
+    esProductor: Boolean,                 // <- nuevo
     onDismissRequest: () -> Unit,
-    onAddToCart: (Producto) -> Unit
+    onAddToCart: (Producto) -> Unit,
+    onDelete: (Producto) -> Unit          // <- nuevo
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -37,7 +39,7 @@ fun ProductDetailSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(bottom = 32.dp) // Padding extra para el navigation bar
+                .padding(bottom = 32.dp)
         ) {
             // Imagen del producto
             Box(
@@ -62,7 +64,7 @@ fun ProductDetailSheet(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                     )
                 }
-                
+
                 // Botón cerrar flotante
                 IconButton(
                     onClick = onDismissRequest,
@@ -196,7 +198,7 @@ fun ProductDetailSheet(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Botón de acción
+                // Botón: Agregar al carrito
                 Button(
                     onClick = { onAddToCart(producto) },
                     modifier = Modifier
@@ -207,6 +209,29 @@ fun ProductDetailSheet(
                     Icon(Icons.Filled.AddShoppingCart, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Agregar al Carrito")
+                }
+
+                // Botón: Eliminar (solo productor/admin)
+                if (esProductor) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedButton(
+                        onClick = { onDelete(producto) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = "Eliminar producto",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Eliminar producto")
+                    }
                 }
             }
         }
