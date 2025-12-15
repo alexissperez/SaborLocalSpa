@@ -22,7 +22,20 @@ Base de datos: MongoDB Atlas como base de datos en la nube para productos, produ
 Pruebas de API y soporte al desarrollo: Postman para probar endpoints, crear datos de prueba y verificar estructura de respuestas JSON antes de integrarlas en la app móvil.​
 
 Funcionalidades principales
-Registro e inicio de sesión con autenticación JWT y manejo de roles (CLIENTE, PRODUCTOR, ADMIN).​
+Registro e inicio de sesión con autenticación JWT y manejo de roles (CLIENTE, PRODUCTOR, ADMIN).
+
+Usuarios de prueba por rol
+Rol CLIENTE
+Usuario: cliente@saborlocal.cl
+Contraseña: Cliente123
+
+Rol PRODUCTOR
+Usuario: productor@saborlocal.cl
+Contraseña: Productor123
+
+Rol ADMIN
+Usuario: admin@saborlocal.cl
+Contraseña: Admin123​
 
 Home con:
 Productos recientes con imagen, nombre, precio y productor.​
