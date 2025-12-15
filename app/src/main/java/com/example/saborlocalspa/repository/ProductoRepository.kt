@@ -98,6 +98,10 @@ class ProductoRepository {
                 precio = precio,
                 unidad = unidad,
                 stock = stock,
+                categoria = "Lacteos",     // o según la pantalla
+                disponible = true,
+                imagen = null,             // luego podrás actualizar con uploadImage
+                imagenThumbnail = null,
                 productor = productorId
             )
 

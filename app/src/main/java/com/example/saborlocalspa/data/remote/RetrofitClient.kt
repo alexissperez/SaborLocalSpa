@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
  */
 object RetrofitClient {
 
-    private const val BASE_URL = "https://saborloca-api.onrender.com/api/"
+    const val BASE_URL = "https://saborlocal-api.onrender.com/api/"
 
     private lateinit var tokenManager: TokenManager
 
@@ -28,10 +28,7 @@ object RetrofitClient {
     }
 
     private val okHttpClient: OkHttpClient by lazy {
-        // AuthInterceptor añade el token JWT a las peticiones automáticamente
         val authInterceptor = AuthInterceptor(tokenManager)
-
-        // LoggingInterceptor registra las peticiones y respuestas para debugging
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
@@ -39,9 +36,9 @@ object RetrofitClient {
         OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
-            .connectTimeout(60, TimeUnit.SECONDS)  // Aumentado para cold starts de Render
-            .readTimeout(90, TimeUnit.SECONDS)     // Aumentado para operaciones lentas
-            .writeTimeout(60, TimeUnit.SECONDS)    // Aumentado para uploads grandes
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(90, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
             .build()
     }
 
@@ -59,53 +56,24 @@ object RetrofitClient {
             .build()
     }
 
-    // ========= API Services - Organizados por dominio =========
-
-    /**
-     * API service para autenticación (login, registro, perfil)
-     */
     val saborLocalAuthApiService: SaborLocalAuthApiService by lazy {
         retrofit.create(SaborLocalAuthApiService::class.java)
     }
-
-    /**
-     * API service para gestión de productos
-     */
     val saborLocalProductoApiService: SaborLocalProductoApiService by lazy {
         retrofit.create(SaborLocalProductoApiService::class.java)
     }
-
-    /**
-     * API service para gestión de productores
-     */
     val saborLocalProductorApiService: SaborLocalProductorApiService by lazy {
         retrofit.create(SaborLocalProductorApiService::class.java)
     }
-
-    /**
-     * API service para gestión de clientes
-     */
     val saborLocalClienteApiService: SaborLocalClienteApiService by lazy {
         retrofit.create(SaborLocalClienteApiService::class.java)
     }
-
-    /**
-     * API service para gestión de pedidos
-     */
     val saborLocalPedidoApiService: SaborLocalPedidoApiService by lazy {
         retrofit.create(SaborLocalPedidoApiService::class.java)
     }
-
-    /**
-     * API service para gestión de entregas
-     */
     val saborLocalEntregaApiService: SaborLocalEntregaApiService by lazy {
         retrofit.create(SaborLocalEntregaApiService::class.java)
     }
-
-    /**
-     * API service para subir archivos (imágenes, documentos)
-     */
     val saborLocalUploadApiService: SaborLocalUploadApiService by lazy {
         retrofit.create(SaborLocalUploadApiService::class.java)
     }

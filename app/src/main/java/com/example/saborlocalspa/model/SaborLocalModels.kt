@@ -1,5 +1,7 @@
 package com.example.saborlocalspa.model
 
+import com.example.saborlocalspa.data.remote.RetrofitClient
+
 data class Productor(
     val id: String,
     val nombre: String? = null,
@@ -26,9 +28,21 @@ data class Producto(
     val unidad: String,
     val stock: Int,
     val productor: Productor,  // Siempre contiene el productor completo
-    val imagen: String? = null,
-    val imagenThumbnail: String? = null
+    val imagen: String? = null,              // p.ej. "uploads/1765-queso.png"
+    val imagenThumbnail: String? = null      // p.ej. "uploads/thumbnails/thumb-..."
 ) {
+    /**
+     * URL completa del thumbnail (o null si no hay)
+     */
+    fun getThumbnailUrl(): String? =
+        imagenThumbnail?.let { path -> RetrofitClient.BASE_URL + path }
+
+    /**
+     * URL completa de la imagen principal (o null si no hay)
+     */
+    fun getImagenUrl(): String? =
+        imagen?.let { path -> RetrofitClient.BASE_URL + path }
+
     /**
      * Retorna el precio formateado
      */
@@ -200,14 +214,6 @@ enum class EstadoEntrega(val displayName: String) {
 
 /**
  * Resultado de una operación de API o repositorio (Success/Error)
- *
- * Renombrado de `Result` a `ApiResult` para evitar colisión de nombres con
- * `kotlin.Result` de la biblioteca estándar de Kotlin.
- *
- * Esto previene:
- * - Ambigüedad en compilación que requiere imports explícitos
- * - Confusión al leer código (¿cuál Result es este?)
- * - Bugs potenciales al usar el tipo incorrecto de Result
  */
 sealed class ApiResult<out T> {
     data class Success<T>(val data: T) : ApiResult<T>()
