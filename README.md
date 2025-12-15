@@ -201,8 +201,7 @@ Verificar códigos de respuesta y estructura JSON antes de integrar con la app m
 
 APK firmado y archivo .jks
 APK firmado de release:
-
-Ruta sugerida en el repositorio: app/release/SaborLocal-v1.0-signed.apk.​
+​
 
 Archivo de keystore (.jks):
 
@@ -215,13 +214,13 @@ Configuración referenciada en app/build.gradle en la sección signingConfigs.�
 Código fuente
 Microservicios / API:
 
-Repositorio: <(https://github.com/alexissperez/Saborlocal.api.git)>
+Repositorio: <https://github.com/alexissperez/Saborlocal.api.git>
 
 Estructura por módulos (auth, productos, productores, pedidos), conexión a MongoDB Atlas y controladores REST.​
 
 Aplicación móvil Android:
 
-Repositorio: <(https://github.com/alexissperez/SaborLocalSpa.git)>
+Repositorio: <https://github.com/alexissperez/SaborLocalSpa.git>
 
 Estructura principal (carpetas data, model, repository, ui, viewmodel tal como se describe arriba).​
 
