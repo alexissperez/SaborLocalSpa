@@ -26,18 +26,6 @@ Registro e inicio de sesión con autenticación JWT y manejo de roles (CLIENTE, 
 
 Usuarios de prueba por rol
 
-Rol CLIENTE
-
-Usuario: cliente@saborlocal.cl
-
-Contraseña: Cliente123
-
-Rol PRODUCTOR
-
-Usuario: productor@saborlocal.cl
-
-Contraseña: Productor123
-
 Rol ADMIN
 
 Usuario: admin@saborlocal.cl
