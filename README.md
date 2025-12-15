@@ -2,7 +2,8 @@ SaborLocal
 SaborLocal es una aplicación móvil Android que conecta productores locales de alimentos con clientes, permitiendo explorar productos artesanales, ver sus detalles, agregarlos al carrito y gestionar pedidos en línea.​
 La app consume una API REST desplegada en la nube, con autenticación basada en JWT y manejo de roles (CLIENTE, PRODUCTOR, ADMIN).​
 
-Integrantes
+Integrantes:
+
 Fernanda Collinao 1 – Rol principal (Frontend Android)
 
 Alexiss Pérez 2 – Rol principal (Base de datos / QA / API)
