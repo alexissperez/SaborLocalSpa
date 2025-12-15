@@ -5,6 +5,13 @@ import com.example.saborlocalspa.data.remote.dto.productor.ProductorDto
 import com.example.saborlocalspa.model.Producto
 import com.example.saborlocalspa.model.Productor
 
+private const val IMAGE_BASE_URL = "https://saborlocal-api.onrender.com"
+
+private fun buildImageUrl(path: String?): String? {
+    if (path.isNullOrBlank()) return null
+    return if (path.startsWith("http")) path else IMAGE_BASE_URL + path
+}
+
 fun ProductoDto.toModel(): Producto {
     return Producto(
         id = id,
@@ -20,8 +27,9 @@ fun ProductoDto.toModel(): Producto {
             telefono = null,
             email = null
         ),
-        imagen = imagen,
-        imagenThumbnail = imagenThumbnail
+        // usa SOLO el campo que sí viene en el JSON
+        imagen = buildImageUrl(imagen ?: imagenThumbnail),
+        imagenThumbnail = null
     )
 }
 

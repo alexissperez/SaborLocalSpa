@@ -207,7 +207,8 @@ fun HomeProductoCard(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
-                } else {
+
+            } else {
                     Icon(
                         imageVector = Icons.Filled.ShoppingBag,
                         contentDescription = null,
