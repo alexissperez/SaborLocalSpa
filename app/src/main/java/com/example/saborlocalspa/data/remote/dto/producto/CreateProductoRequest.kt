@@ -9,5 +9,9 @@ data class CreateProductoRequest(
     val precio: Double,
     val unidad: String,
     val stock: Int,
-    val productor: String  // ID del productor
+    val categoria: String,          // p.ej. "Lacteos", "Conservas"
+    val disponible: Boolean = true, // por defecto disponible
+    val imagen: String? = null,     // path como "uploads/....png" (opcional)
+    val imagenThumbnail: String? = null, // path thumbnail (opcional)
+    val productor: String           // ID del productor
 )

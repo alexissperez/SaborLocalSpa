@@ -32,6 +32,7 @@ import com.example.saborlocalspa.ui.components.StandardScaffold
 import com.example.saborlocalspa.viewmodel.ProductoViewModel
 import com.example.saborlocalspa.viewmodel.ProductosListUiState
 import com.example.saborlocalspa.viewmodel.ProductosListViewModel
+import com.example.saborlocalspa.data.remote.RetrofitClient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -259,6 +260,14 @@ fun ProductoCardGrid(
     producto: Producto,
     onClick: () -> Unit
 ) {
+    // construimos la URL completa: base + path
+    val imagePath = producto.imagenThumbnail ?: producto.imagen
+    val imageUrl = if (!imagePath.isNullOrBlank()) {
+        RetrofitClient.BASE_URL + imagePath
+    } else {
+        null
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -291,7 +300,7 @@ fun ProductoCardGrid(
                 )
 
                 AsyncImage(
-                    model = producto.imagenThumbnail ?: producto.imagen,
+                    model = imageUrl,
                     contentDescription = producto.nombre,
                     modifier = Modifier
                         .fillMaxSize()
