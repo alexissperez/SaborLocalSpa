@@ -1,93 +1,33 @@
-SaborLocal
-SaborLocal es una aplicación móvil Android que conecta productores locales de alimentos con clientes, permitiendo explorar productos artesanales, ver sus detalles, agregarlos al carrito y gestionar pedidos en línea.​
-La app consume una API REST desplegada en la nube, con autenticación basada en JWT y manejo de roles (CLIENTE, PRODUCTOR, ADMIN).​
+Proyecto Semestral:  SaborLocalSpa
+SaborLocal es una aplicación móvil Android que conecta productores locales de alimentos con clientes, permitiendo explorar productos artesanales, ver sus detalles, agregarlos al carrito y gestionar pedidos en línea a través de una API REST desplegada en la nube con autenticación JWT y manejo de roles (CLIENTE, PRODUCTOR, ADMIN).
 
-Integrantes:
+## Integrantes
 
-Fernanda Collinao 1 – Rol principal (Frontend Android)
+- Fernanda Collinao – Frontend Android / Integración API  
+- Alexiss Pérez – Frontend Android / Integración API y coordinación con Backend  
 
-Alexiss Pérez 2 – Rol principal (Base de datos / QA / API)
+## Repositorios
 
-Tecnologías y herramientas
-Frontend móvil: Kotlin, Android, Jetpack Compose, ViewModel, StateFlow.​
+- Frontend (App Android): https://github.com/alexissperez/SaborLocalSpa.git
+- Backend (API SaborLocal): https://github.com/alexissperez/Saborlocal.api.git
 
-Red y datos: Retrofit, OkHttp, Gson, manejo de interceptores para token JWT.​
+## Descripción general
 
-Carga de imágenes: Coil, construyendo URLs a partir de rutas almacenadas en la API.​
+La app permite registrarse como cliente o productor, iniciar sesión, navegar por productos y productores, agregar productos al carrito y crear pedidos consumiendo datos desde un backend propio desplegado en Render y conectado a MongoDB Atlas.
+Las imágenes de productos se almacenan en el servidor y se sirven mediante URLs que la app consume con Coil, construidas a partir de las rutas `imagen` e `imagenThumbnail` guardadas en la base de datos.
 
-Backend: API REST (NestJS/Node) desplegada en Render, siguiendo arquitectura por módulos.​
+## Tecnologías y herramientas
 
-Base de datos: MongoDB Atlas como base de datos en la nube para productos, productores, usuarios, pedidos y entregas.​
+- Frontend móvil: Kotlin, Android, Jetpack Compose, ViewModel, StateFlow.
+- Red y datos: Retrofit, OkHttp, Gson, interceptores para token JWT.
+- Carga de imágenes: Coil, usando URLs construidas desde las rutas de imagen devueltas por la API.
+- Backend: API REST en NestJS/Node desplegada en Render, con módulos para auth, usuarios, productos, productores y pedidos.
+- Base de datos: MongoDB Atlas como base de datos en la nube para usuarios, productores, productos, pedidos y entregas.
+- Pruebas de API: Postman, usado para probar autenticación, CRUD de recursos, subida de imágenes y generar datos de prueba.
 
-Pruebas de API y soporte al desarrollo: Postman para probar endpoints, crear datos de prueba y verificar estructura de respuestas JSON antes de integrarlas en la app móvil.​
+## Estructura de carpetas (Android)
 
-Funcionalidades principales
-Registro e inicio de sesión con autenticación JWT y manejo de roles (CLIENTE, PRODUCTOR, ADMIN).
-
-Usuarios de prueba por rol
-
-Rol ADMIN
-
-Usuario: admin@saborlocal.cl
-
-Contraseña: Admin123​
-
-Home con:
-
-Productos recientes con imagen, nombre, precio y productor.
-​
-Productores destacados.
-​
-Accesos rápidos a productores, productos, carrito y pedidos.​
-
-Listado y detalle de productos:
-
-Visualización de imágenes servidas por la API (rutas imagen e imagenThumbnail guardadas en MongoDB Atlas y consumidas vía Coil).
-​
-Información de productor, precio, unidad, stock y descripción, con aviso de stock bajo.
-​
-Agregar productos al carrito desde el detalle.​
-
-Gestión de carrito y pedidos:
-
-Agregar y quitar productos del carrito.
-​
-Cálculo de subtotal y total del pedido.
-​
-Creación de pedidos con listado de ítems asociados al cliente.​
-
-Panel para productor / admin:
-
-Crear nuevos productos desde la app mediante formulario validado en el ViewModel.
-​
-Ver productos propios y eliminarlos según permisos del rol.​
-
-Integración con subida de imágenes:
-
-Subida de imágenes hacia la API (probadas con Postman usando multipart/form-data).
-​
-Almacenamiento de rutas imagen e imagenThumbnail en MongoDB Atlas, consumidas luego por la app.​
-
-Descripción de arquitectura y flujo de datos
-
-La app Android se comunica exclusivamente con la API REST mediante Retrofit, enviando y recibiendo JSON, sin conectarse directamente a la base de datos.
-​
-La API se encarga de gestionar la lógica de negocio, seguridad con JWT y acceso a MongoDB Atlas usando una cadena de conexión configurada como variable de entorno.​
-
-Durante el desarrollo se utilizó Postman para:​
-
-Registrar usuarios con distintos roles y verificar el flujo de login.
-
-Crear, actualizar y eliminar productos y productores verificando el formato de los JSON.
-
-Probar subida de archivos (multipart/form-data) para imágenes de productos y validar que las rutas se guarden correctamente en MongoDB Atlas.
-
-Una vez validados los endpoints en Postman, se replicaron los mismos cuerpos y rutas en los DTO (CreateProductoRequest, UpdateProductoRequest) y en los métodos del repositorio 
-
-(ProductoRepository.createProducto, updateProducto, uploadImage).​
-
-Estructura de carpetas (Android)
-text
+```text
 app/
 └── src/
     └── main/
@@ -120,6 +60,7 @@ app/
         │   │   ├── Cliente.kt
         │   │   └── ApiResult.kt
         │   ├── repository/
+        │   │   ├── AuthSaborLocalRepository.kt
         │   │   └── ProductoRepository.kt
         │   ├── ui/
         │   │   ├── components/
@@ -128,158 +69,121 @@ app/
         │   │   │   └── ProductorCard.kt
         │   │   └── screens/
         │   │       ├── HomeScreen.kt
+        │   │       ├── RegisterScreen.kt
+        │   │       ├── LoginScreen.kt
         │   │       ├── CreateProductoScreen.kt
         │   │       └── ProductosListScreen.kt
         │   └── viewmodel/
         │       ├── HomeViewModel.kt
+        │       ├── RegisterViewModel.kt
+        │       ├── LoginViewModel.kt
         │       ├── ProductoViewModel.kt
         │       └── CreateProductoViewModel.kt
         └── res/...
-data/: acceso a datos remotos y locales, más mapeo DTO → modelo de dominio.​
+```
 
-model/: modelos de dominio usados por UI y repositorios.​
+`data` centraliza el acceso remoto/local y los mapeos DTO → dominio, `model` define los modelos usados por la UI, `repository` encapsula la lógica de comunicación con la API, `ui` contiene pantallas y componentes reutilizables y `viewmodel` maneja el estado y la lógica de presentación.[3]
 
-repository/: encapsula la lógica de comunicación con la API.​
+## Flujo de datos, Postman y MongoDB Atlas
 
-ui/: pantallas (screens) y componentes reutilizables (components).​
+La app Android solo se comunica con la API REST mediante Retrofit (base URL `https://saborlocal-api.onrender.com/api/`) y nunca accede directamente a MongoDB Atlas, lo que asegura un bajo acoplamiento entre cliente y base de datos.
+Durante el desarrollo se utilizó Postman para registrar usuarios de prueba, crear y actualizar productos y productores, y probar la subida de imágenes con multipart/form-data, verificando que las rutas se guardaran correctamente en MongoDB Atlas antes de integrarlas en la app.
 
-viewmodel/: lógica de presentación, manejo de estado y orquestación de repositorios.​
+## Integración con MongoDB Atlas
 
-Endpoints usados
+La API se conecta a MongoDB Atlas usando una cadena de conexión configurada en la variable de entorno `MONGODB_URI`.
+Se manejan colecciones para usuarios (con roles y contraseñas encriptadas), productores (perfil, ubicación, categorías), productos (referenciando al productor por su `_id`) y pedidos/entregas, incluyendo campos de rutas de imagen que la app usa para construir las URLs finales.
 
-Propios (API SaborLocal)
+## Funcionalidades principales
+
+- Registro e inicio de sesión con JWT y manejo de roles CLIENTE, PRODUCTOR y ADMIN.
+- Home con productos recientes, productores destacados y accesos rápidos a secciones como carrito y pedidos.
+- Listado y detalle de productos, mostrando imagen, precio, unidad, stock, descripción y productor, con acción para agregar al carrito.
+- Gestión de carrito y pedidos: agregar/quitar ítems, cálculo de subtotal y total y creación de pedidos asociados al cliente autenticado.
+- Panel para productores/admin con formulario para crear productos, validaciones en el ViewModel y gestión (listado/eliminación) de productos propios.
+
+## Endpoints usados
 
 Base URL:
 
-text
-
+```text
 https://saborlocal-api.onrender.com/api/
+```
 
-Principales endpoints (método + ruta):​
+Principales endpoints de la API SaborLocal:
 
-Autenticación
+- Autenticación  
+  - `POST /auth/register` – Registro de usuario.  
+  - `POST /auth/login` – Inicio de sesión y obtención de JWT.  
+  - `GET /auth/profile` – Perfil del usuario autenticado.  
 
-POST /auth/register – Registro de usuario.
+- Productores  
+  - `GET /productores` – Listar productores.  
+  - `GET /productores/{id}` – Obtener productor por id.  
+  - `POST /productores/profile` – Crear perfil de productor.  
 
-POST /auth/login – Inicio de sesión y obtención de JWT.
+- Productos  
+  - `GET /productos` – Listar productos.  
+  - `GET /productos/{id}` – Detalle de producto.  
+  - `GET /productos/productor/{productorId}` – Productos por productor.  
+  - `POST /productos` – Crear producto.  
+  - `PATCH /productos/{id}` – Actualizar producto.  
+  - `DELETE /productos/{id}` – Eliminar producto.  
+  - `POST /productos/{id}/upload-image` – Subir imagen de producto.  
 
-GET /auth/profile – Perfil del usuario autenticado.
+- Clientes y pedidos  
+  - `GET /clientes/{id}` – Datos de cliente.  
+  - `POST /pedidos` – Crear pedido.  
+  - `GET /pedidos/cliente/{clienteId}` – Pedidos por cliente.  
+  - `GET /pedidos/{id}` – Detalle de pedido.  
 
-Productores
+No se consumen APIs externas; toda la información proviene del backend propio y de MongoDB Atlas.
 
-GET /productores – Listar productores.
+## Usuarios de prueba y roles
 
-GET /productores/{id} – Obtener productor por id.
+Para la corrección se definieron usuarios de prueba para cada rol del sistema:
 
-POST /productores/profile – Crear perfil de productor para un usuario PRODUCTOR.
+- CLIENTE: `cliente@saborlocal.cl` / `Cliente123`  
+- PRODUCTOR: `productor@saborlocal.cl` / `Productor123`  
+- ADMIN: `admin@saborlocal.cl` / `Admin123`  
 
-Productos
+Estos usuarios se crearon inicialmente mediante Postman utilizando el endpoint `/auth/register`.
 
-GET /productos – Listar productos.
+## Instrucciones para ejecutar el proyecto
 
-GET /productos/{id} – Obtener detalle de producto.
+### Backend (API SaborLocal)
 
-GET /productos/productor/{productorId} – Listar productos por productor.
+1. Clonar el repositorio: `git clone https://github.com/alexissperez/Saborlocal.api.git`.
+2. Configurar variables de entorno (por ejemplo en `.env`):  
+   - `MONGODB_URI` – cadena de conexión a MongoDB Atlas.
+   - `JWT_SECRET` – clave para firmar tokens JWT.
+   - `PORT` – puerto del servidor.
+3. Instalar dependencias y levantar el servidor:
 
-POST /productos – Crear producto.
-
-PATCH /productos/{id} – Actualizar producto.
-
-DELETE /productos/{id} – Eliminar producto.
-
-POST /productos/{id}/upload-image – Subir imagen asociada al producto.
-
-Clientes y pedidos
-
-GET /clientes/{id} – Obtener información de cliente.
-
-POST /pedidos – Crear pedido.
-
-GET /pedidos/cliente/{clienteId} – Listar pedidos por cliente.
-
-GET /pedidos/{id} – Obtener detalle de pedido.
-
-Endpoints externos
-
-No se integran APIs públicas externas; toda la información proviene del backend propio desplegado en Render y de MongoDB Atlas.​
-
-Instrucciones para ejecutar el proyecto
-
-1. Backend (microservicios / API)
-2. 
-Clonar el repositorio del backend.​
-
-Configurar variables de entorno (por ejemplo en .env):
-
-MONGODB_URI: cadena de conexión a MongoDB Atlas.​
-
-JWT_SECRET: clave secreta para firmar tokens JWT.​
-
-PORT: puerto de ejecución del servidor.​
-
-Instalar dependencias y levantar el servidor (NestJS/Node):
-
-bash
+```bash
 npm install
-npm run start:prod   # o start:dev según configuración
-Verificar que la API responde en un endpoint de salud, por ejemplo:​
+npm run start:prod    # o npm run start:dev
+```
 
-text
-https://saborlocal-api.onrender.com/api/health
-2. App móvil Android
-Clonar el repositorio de la app móvil.​
+4. Verificar el endpoint de salud, por ejemplo: `https://saborlocal-api.onrender.com/api/health`.
 
-Abrir el proyecto en Android Studio.​
+### App móvil Android
 
-Verificar la URL base de la API en RetrofitClient.kt:​
+1. Clonar el repositorio: `git clone https://github.com/alexissperez/SaborLocalSpa.git`.
+2. Abrir el proyecto en Android Studio.
+3. Confirmar la URL base de Retrofit en `RetrofitClient.kt`:
 
-kotlin
-
+```kotlin
 const val BASE_URL = "https://saborlocal-api.onrender.com/api/"
+```
 
-Conectar un dispositivo físico o emulador.​
+4. Conectar un emulador o dispositivo físico y ejecutar la app desde Android Studio.
 
-Compilar y ejecutar la app desde Android Studio (Run ▶).​
+## APK firmado y archivo .jks
 
-3. Uso de Postman durante el desarrollo
-Probar todos los endpoints de autenticación, productos y productores.​
+El APK firmado de release se ubica en `app/release/SaborLocal-v1.0-signed.apk`.
+El archivo de keystore (`saborlocal-release.jks`) no se versiona en el repositorio público y se configura en la sección `signingConfigs` del módulo `app` en `build.gradle`.
 
-Crear datos iniciales de prueba (usuarios, productores, productos).​
+## Evidencia de trabajo colaborativo
 
-Subir imágenes y obtener las rutas que se almacenan en MongoDB Atlas.​
-
-Verificar códigos de respuesta y estructura JSON antes de integrar con la app móvil.​
-
-APK firmado y archivo .jks
-APK firmado de release:
-​
-
-Archivo de keystore (.jks):
-
-No se versiona en el repositorio público por seguridad.​
-
-Ruta local usada en el proyecto (documentar para corrección): keystore/saborlocal-release.jks.​
-
-Configuración referenciada en app/build.gradle en la sección signingConfigs.​
-
-Código fuente
-Microservicios / API:
-
-Repositorio: <https://github.com/alexissperez/Saborlocal.api.git>
-
-Estructura por módulos (auth, productos, productores, pedidos), conexión a MongoDB Atlas y controladores REST.​
-
-Aplicación móvil Android:
-
-Repositorio: <https://github.com/alexissperez/SaborLocalSpa.git>
-
-Estructura principal (carpetas data, model, repository, ui, viewmodel tal como se describe arriba).​
-
-Evidencia de trabajo colaborativo
-El repositorio usa Git como control de versiones, con commits distribuidos entre los integrantes.​​
-
-Ejemplos de actividades por persona:
-
-Integrante 1: implementación de Home, tarjetas de producto, integración con Retrofit y Coil.​
-Integrante 2: endpoints de productos y productores, subida de imágenes y conexión a MongoDB Atlas.​
-Integrante 3: flujo de pedidos y carrito, documentación y pruebas con Postman.
+El control de versiones se realizó con Git en GitHub, con commits distribuidos en ambos repositorios entre Fernanda Collinao y Alexiss Pérez, lo que permite revisar el historial de cambios, ramas y contribuciones de cada integrante.
