@@ -25,51 +25,78 @@ Funcionalidades principales
 Registro e inicio de sesión con autenticación JWT y manejo de roles (CLIENTE, PRODUCTOR, ADMIN).
 
 Usuarios de prueba por rol
+
 Rol CLIENTE
+
 Usuario: cliente@saborlocal.cl
+
 Contraseña: Cliente123
 
 Rol PRODUCTOR
+
 Usuario: productor@saborlocal.cl
+
 Contraseña: Productor123
 
 Rol ADMIN
+
 Usuario: admin@saborlocal.cl
+
 Contraseña: Admin123​
 
 Home con:
-Productos recientes con imagen, nombre, precio y productor.​
-Productores destacados.​
+
+Productos recientes con imagen, nombre, precio y productor.
+​
+Productores destacados.
+​
 Accesos rápidos a productores, productos, carrito y pedidos.​
 
 Listado y detalle de productos:
-Visualización de imágenes servidas por la API (rutas imagen e imagenThumbnail guardadas en MongoDB Atlas y consumidas vía Coil).​
-Información de productor, precio, unidad, stock y descripción, con aviso de stock bajo.​
+
+Visualización de imágenes servidas por la API (rutas imagen e imagenThumbnail guardadas en MongoDB Atlas y consumidas vía Coil).
+​
+Información de productor, precio, unidad, stock y descripción, con aviso de stock bajo.
+​
 Agregar productos al carrito desde el detalle.​
 
 Gestión de carrito y pedidos:
-Agregar y quitar productos del carrito.​
-Cálculo de subtotal y total del pedido.​
+
+Agregar y quitar productos del carrito.
+​
+Cálculo de subtotal y total del pedido.
+​
 Creación de pedidos con listado de ítems asociados al cliente.​
 
 Panel para productor / admin:
-Crear nuevos productos desde la app mediante formulario validado en el ViewModel.​
+
+Crear nuevos productos desde la app mediante formulario validado en el ViewModel.
+​
 Ver productos propios y eliminarlos según permisos del rol.​
 
 Integración con subida de imágenes:
-Subida de imágenes hacia la API (probadas con Postman usando multipart/form-data).​
+
+Subida de imágenes hacia la API (probadas con Postman usando multipart/form-data).
+​
 Almacenamiento de rutas imagen e imagenThumbnail en MongoDB Atlas, consumidas luego por la app.​
 
 Descripción de arquitectura y flujo de datos
-La app Android se comunica exclusivamente con la API REST mediante Retrofit, enviando y recibiendo JSON, sin conectarse directamente a la base de datos.​
+
+La app Android se comunica exclusivamente con la API REST mediante Retrofit, enviando y recibiendo JSON, sin conectarse directamente a la base de datos.
+​
 La API se encarga de gestionar la lógica de negocio, seguridad con JWT y acceso a MongoDB Atlas usando una cadena de conexión configurada como variable de entorno.​
 
 Durante el desarrollo se utilizó Postman para:​
 
 Registrar usuarios con distintos roles y verificar el flujo de login.
+
 Crear, actualizar y eliminar productos y productores verificando el formato de los JSON.
+
 Probar subida de archivos (multipart/form-data) para imágenes de productos y validar que las rutas se guarden correctamente en MongoDB Atlas.
-Una vez validados los endpoints en Postman, se replicaron los mismos cuerpos y rutas en los DTO (CreateProductoRequest, UpdateProductoRequest) y en los métodos del repositorio (ProductoRepository.createProducto, updateProducto, uploadImage).​
+
+Una vez validados los endpoints en Postman, se replicaron los mismos cuerpos y rutas en los DTO (CreateProductoRequest, UpdateProductoRequest) y en los métodos del repositorio 
+
+(ProductoRepository.createProducto, updateProducto, uploadImage).​
 
 Estructura de carpetas (Android)
 text
@@ -131,47 +158,67 @@ ui/: pantallas (screens) y componentes reutilizables (components).​
 viewmodel/: lógica de presentación, manejo de estado y orquestación de repositorios.​
 
 Endpoints usados
+
 Propios (API SaborLocal)
+
 Base URL:
 
 text
+
 https://saborlocal-api.onrender.com/api/
+
 Principales endpoints (método + ruta):​
 
 Autenticación
 
 POST /auth/register – Registro de usuario.
+
 POST /auth/login – Inicio de sesión y obtención de JWT.
+
 GET /auth/profile – Perfil del usuario autenticado.
 
 Productores
 
 GET /productores – Listar productores.
+
 GET /productores/{id} – Obtener productor por id.
+
 POST /productores/profile – Crear perfil de productor para un usuario PRODUCTOR.
 
 Productos
 
 GET /productos – Listar productos.
+
 GET /productos/{id} – Obtener detalle de producto.
+
 GET /productos/productor/{productorId} – Listar productos por productor.
+
 POST /productos – Crear producto.
+
 PATCH /productos/{id} – Actualizar producto.
+
 DELETE /productos/{id} – Eliminar producto.
+
 POST /productos/{id}/upload-image – Subir imagen asociada al producto.
 
 Clientes y pedidos
 
 GET /clientes/{id} – Obtener información de cliente.
+
 POST /pedidos – Crear pedido.
+
 GET /pedidos/cliente/{clienteId} – Listar pedidos por cliente.
+
 GET /pedidos/{id} – Obtener detalle de pedido.
 
 Endpoints externos
+
 No se integran APIs públicas externas; toda la información proviene del backend propio desplegado en Render y de MongoDB Atlas.​
 
 Instrucciones para ejecutar el proyecto
+
 1. Backend (microservicios / API)
+2. 
 Clonar el repositorio del backend.​
 
 Configurar variables de entorno (por ejemplo en .env):
@@ -199,7 +246,9 @@ Abrir el proyecto en Android Studio.​
 Verificar la URL base de la API en RetrofitClient.kt:​
 
 kotlin
+
 const val BASE_URL = "https://saborlocal-api.onrender.com/api/"
+
 Conectar un dispositivo físico o emulador.​
 
 Compilar y ejecutar la app desde Android Studio (Run ▶).​
