@@ -1,4 +1,4 @@
-Proyecto Semestral:  SaborLocalSpa
+##Proyecto Semestral:  SaborLocalSpa
 SaborLocal es una aplicación móvil Android que conecta productores locales de alimentos con clientes, permitiendo explorar productos artesanales, ver sus detalles, agregarlos al carrito y gestionar pedidos en línea a través de una API REST desplegada en la nube con autenticación JWT y manejo de roles (CLIENTE, PRODUCTOR, ADMIN).
 
 ## Integrantes
